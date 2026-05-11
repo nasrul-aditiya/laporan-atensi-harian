@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tambah User</title>
+
+  <!-- SweetAlert -->
+  <link rel="stylesheet" href="sweetalert2.min.css">
+  <script src="sweetalert2.min.js"></script>
+
+  <script src="auth.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 450px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .btn-group {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .simpan { background: #2ecc71; }
+    .logout { background: #e74c3c; }
+    .back { background: #3498db; }
+
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
+
+  <script>
+    cekLogin();
+
+    if (localStorage.getItem("role") !== "admin") {
+      Swal.fire({
+        icon: "error",
+        title: "Akses ditolak",
+        text: "Halaman ini hanya untuk admin",
+      }).then(() => {
+        window.location.href = "index.html";
+      });
+    }
+  </script>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>👤 Tambah User</h2>
+
+  <label>Nama</label>
+  <input type="text" id="nama" placeholder="Masukkan nama">
+
+  <label>Jabatan</label>
+  <input type="text" id="jabatan" placeholder="Masukkan jabatan">
+
+  <label>Username</label>
+  <input type="text" id="username" placeholder="Masukkan username">
+
+  <label>Password</label>
+  <input type="password" id="password" placeholder="Masukkan password">
+
+  <label>Role</label>
+  <select id="role">
+    <option value="user">User</option>
+    <option value="admin">Admin</option>
+  </select>
+
+  <div class="btn-group">
+    <button class="simpan" onclick="tambahUser()">💾 Simpan</button>
+    <button class="back" onclick="window.location.href='dashboard.html'">⬅️ Kembali</button>
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<script>
+function tambahUser() {
+  const nama = document.getElementById("nama").value.trim();
+  const jabatan = document.getElementById("jabatan").value.trim();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const role = document.getElementById("role").value;
+
+  // VALIDASI
+  if (!nama || !username || !password) {
+    Swal.fire({
+      icon: "warning",
+      title: "Data belum lengkap",
+      text: "Nama, Username, dan Password wajib diisi"
+    });
+    return;
+  }
+
+  // LOADING
+  Swal.fire({
+    title: "Menyimpan...",
+    text: "Mohon tunggu",
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  fetch("http://localhost:3000/api/user", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": localStorage.getItem("token")
+    },
+    body: JSON.stringify({
+      nama,
+      jabatan,
+      username,
+      password,
+      role
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+  Swal.fire({
+    icon: "success",
+    title: "Berhasil",
+    text: data.message,
+    timer: 1500,
+    showConfirmButton: false
+  });
+
+  // reset form
+  document.getElementById("nama").value = "";
+  document.getElementById("jabatan").value = "";
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("role").value = "user";
+
+  // fokus ke input pertama
+  document.getElementById("nama").focus();
+})
+  .catch(() => {
+    Swal.fire({
+      icon: "error",
+      title: "Gagal",
+      text: "Gagal tambah user"
+    });
+  });
+}
+</script>
+
+</body>
+</html>

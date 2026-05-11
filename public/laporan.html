@@ -1,0 +1,339 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Manajemen Laporan</title>
+
+    <script src="auth.js"></script>
+    <link rel="stylesheet" href="sweetalert2.min.css" />
+    <script src="sweetalert2.min.js"></script>
+
+    <style>
+      body {
+        font-family: Arial;
+        background: #f4f6f8;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        margin-top: 0;
+      }
+
+      .filter {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+      }
+
+      input,
+      select {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      button {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+      }
+
+      .cari {
+        background: #2ecc71;
+      }
+      .hapus {
+        background: #e74c3c;
+      }
+      .back {
+        background: #3498db;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background: #3498db;
+        color: white;
+      }
+
+      #summary {
+        display: flex;
+        justify-content: space-between;
+        font-size: 15px;
+      }
+    </style>
+
+    <script>
+      cekLogin();
+
+      if (localStorage.getItem("role") !== "admin") {
+        Swal.fire({
+          icon: "error",
+          title: "Akses ditolak",
+        }).then(() => {
+          window.location.href = "index.html";
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>📊 Manajemen Laporan</h2>
+
+      <button class="back" onclick="window.location.href = 'dashboard.html'">
+        ⬅️ Kembali
+      </button>
+
+      <div class="filter">
+        <input type="date" id="dari" />
+        <input type="date" id="sampai" />
+
+        <button class="cari" onclick="loadLaporan()">🔍 Cari</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>User</th>
+            <th>Jumlah Postingan</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tabelLaporan"></tbody>
+      </table>
+      <div
+        id="summary"
+        style="
+          margin-top: 15px;
+          padding: 10px;
+          background: #ecf0f1;
+          border-radius: 6px;
+          font-weight: bold;
+        "
+      >
+        Total Laporan: 0 | Total Postingan: 0
+      </div>
+    </div>
+
+    <script>
+      function loadLaporan() {
+        const dari = document.getElementById("dari").value;
+        const sampai = document.getElementById("sampai").value;
+
+        let url = "http://localhost:3000/api/laporan";
+
+        if (dari && sampai) {
+          url += `?dari=${dari}&sampai=${sampai}`;
+        }
+
+        fetch(url, {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            let html = "";
+            let totalLaporan = data.length;
+            let totalPostingan = 0;
+
+            data.forEach((l) => {
+              totalPostingan += Number(l.jumlah_postingan || 0);
+
+              html += `
+        <tr>
+          <td>${formatTanggalIndo(l.tanggal)}</td>
+          <td>${l.nama}</td>
+          <td>${l.jumlah_postingan}</td>
+          <td>
+            <button style="background:#3498db" onclick="viewLaporan(${l.id})">View</button>
+            <button class="hapus" onclick="hapusLaporan(${l.id})">Hapus</button>
+          </td>
+        </tr>
+      `;
+            });
+
+            document.getElementById("tabelLaporan").innerHTML = html;
+
+            // 🔥 UPDATE SUMMARY
+            document.getElementById("summary").innerHTML = `
+      📊 Total Laporan: <b>${totalLaporan}</b> |
+      📌 Total Postingan: <b>${totalPostingan}</b>
+    `;
+          });
+      }
+
+      // ================= DELETE =================
+      function hapusLaporan(id) {
+        Swal.fire({
+          title: "Yakin hapus?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Ya",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(`http://localhost:3000/api/laporan/${id}`, {
+              method: "DELETE",
+              headers: {
+                Authorization: localStorage.getItem("token"),
+              },
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                Swal.fire("Berhasil", data.message, "success");
+                loadLaporan();
+              });
+          }
+        });
+      }
+
+      function formatTanggalIndo(tgl) {
+        const hari = [
+          "Minggu",
+          "Senin",
+          "Selasa",
+          "Rabu",
+          "Kamis",
+          "Jumat",
+          "Sabtu",
+        ];
+        const bulan = [
+          "Januari",
+          "Februari",
+          "Maret",
+          "April",
+          "Mei",
+          "Juni",
+          "Juli",
+          "Agustus",
+          "September",
+          "Oktober",
+          "November",
+          "Desember",
+        ];
+
+        const d = new Date(tgl);
+
+        return `${hari[d.getDay()]}, ${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+      }
+
+      function viewLaporan(id) {
+        fetch(`http://localhost:3000/api/laporan/${id}`, {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            let uraian = "";
+
+            Object.values(data.postingan).forEach((p, i) => {
+              uraian += `${i + 1}. Konten Informatif "${p.judul}"\n\n`;
+
+              p.platform.forEach((pl) => {
+                let label = pl.jenis;
+
+                if (pl.jenis === "ig") label = "Instagram";
+                else if (pl.jenis === "fb") label = "Facebook";
+                else if (pl.jenis === "x") label = "X / Twitter";
+                else if (pl.jenis === "tt") label = "TikTok";
+
+                uraian += `${label} : ${pl.link}\n\n`;
+              });
+            });
+
+            const tanggalFormat = formatTanggalIndo(data.tanggal);
+
+            const laporan = `
+LAPORAN ATENSI PIMPINAN
+
+Assalamu’alaikum Wr. Wb. Kepada Yth :
+1. Plt. Direktur Jenderal Imigrasi;
+2. Sekretaris Direktorat Jenderal Imigrasi;
+3. Para Direktur di lingkungan Direktorat Jenderal Imigrasi;
+4. Kepala Kantor Wilayah Direktorat Jenderal Imigrasi Kalimantan Barat;
+
+I. KEGIATAN
+Kegiatan Kinerja Harian, ${tanggalFormat}
+
+II. WAKTU DAN TEMPAT
+Waktu  : ${tanggalFormat}
+Pukul  : 14.00 - 15.00 WIB
+Tempat : Kanim Sambas
+
+III. URAIAN KEGIATAN
+${uraian}
+Demikian Laporan Kegiatan ini kami sampaikan, atas perhatiannya kami ucapkan terima kasih.
+
+Salam Hormat
+Kepala Kantor Imigrasi Kelas II TPI Sambas
+`;
+
+            Swal.fire({
+              title: "📄 Laporan Lengkap",
+              width: 800,
+              html: `
+        <textarea id="laporanText" style="
+          width:100%;
+          height:400px;
+          border:none;
+          outline:none;
+          resize:none;
+          font-family:monospace;
+          white-space:pre;
+        ">${laporan}</textarea>
+      `,
+              showConfirmButton: true,
+              confirmButtonText: "Tutup",
+              didOpen: () => {
+                // 🔥 Tambah tombol copy
+                const btn = document.createElement("button");
+                btn.innerText = "📋 Salin Laporan";
+                btn.style.marginBottom = "10px";
+                btn.style.background = "#3498db";
+                btn.style.color = "white";
+                btn.style.border = "none";
+                btn.style.padding = "8px 12px";
+                btn.style.borderRadius = "5px";
+                btn.style.cursor = "pointer";
+
+                const container = Swal.getHtmlContainer();
+                container.prepend(btn);
+
+                btn.onclick = () => {
+                  const text = document.getElementById("laporanText").value;
+
+                  navigator.clipboard.writeText(text).then(() => {
+                    Swal.fire("Berhasil", "Laporan disalin", "success");
+                  });
+                };
+              },
+            });
+          });
+      }
+
+      loadLaporan();
+    </script>
+  </body>
+</html>

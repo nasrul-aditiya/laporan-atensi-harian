@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Dashboard Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="sweetalert2.min.css" />
+    <script src="sweetalert2.min.js"></script>
+    <script src="auth.js"></script>
+
+    <style>
+      body {
+        font-family: Arial;
+        background: #f4f6f8;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+        margin-left: 5px;
+      }
+
+      .btn-user {
+        background: #9b59b6;
+      }
+
+      .btn-laporan {
+        background: #9b59b6;
+      }
+      .logout {
+        background: red;
+      }
+      .tambah {
+        background: #3498db;
+      }
+
+      .card-container {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .card {
+        flex: 1;
+        min-width: 200px;
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .blue {
+        background: #3498db;
+      }
+      .green {
+        background: #2ecc71;
+      }
+      .orange {
+        background: #f39c12;
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 15px;
+      }
+
+      .card p {
+        font-size: 26px;
+        margin-top: 10px;
+        font-weight: bold;
+      }
+
+      .chart-box {
+        background: white;
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+
+    <script>
+      cekLogin();
+
+      if (localStorage.getItem("role") !== "admin") {
+        alert("Akses ditolak!");
+        window.location.href = "login.html";
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="header">
+      <div>
+        <h2>📊 Dashboard Admin</h2>
+        <small id="salamUser" style="color: #555"></small>
+      </div>
+
+      <div>
+        <button
+          class="btn tambah"
+          onclick="window.location.href = 'tambah-user.html'"
+        >
+          + User
+        </button>
+        <button
+          class="btn btn-user"
+          onclick="window.location.href = 'user.html'"
+        >
+          👥 Manajemen User
+        </button>
+        <button
+          class="btn btn-laporan"
+          onclick="window.location.href = 'laporan.html'"
+        >
+          📊 Manajemen Laporan
+        </button>
+        <button class="btn logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <!-- CARD -->
+    <div class="card-container">
+      <div class="card blue">
+        <h3>Postingan Minggu Ini</h3>
+        <p id="mingguan">0</p>
+      </div>
+
+      <div class="card green">
+        <h3>User Teraktif</h3>
+        <p id="topUser">-</p>
+      </div>
+
+      <div class="card orange">
+        <h3>Total Laporan</h3>
+        <p id="total">0</p>
+      </div>
+    </div>
+
+    <!-- GRAFIK -->
+    <div class="chart-box">
+      <canvas id="grafik" height="500"></canvas>
+    </div>
+
+    <script>
+      // ==================== GRAFIK (cara lama) ====================
+      fetch("http://localhost:3000/api/grafik")
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("grafik:", data);
+
+          const bulanLabel = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "Mei",
+            "Jun",
+            "Jul",
+            "Agu",
+            "Sep",
+            "Okt",
+            "Nov",
+            "Des",
+          ];
+
+          // buat array default 12 bulan isi 0
+          let dataBulanan = new Array(12).fill(0);
+
+          // isi data dari database
+          data.forEach((d) => {
+            dataBulanan[d.bulan - 1] = d.total;
+          });
+
+          // total laporan
+          const total = dataBulanan.reduce((a, b) => a + b, 0);
+          document.getElementById("total").innerText = total;
+
+          new Chart(document.getElementById("grafik"), {
+            type: "bar",
+            data: {
+              labels: bulanLabel,
+              datasets: [
+                {
+                  label: "Jumlah Laporan",
+                  data: dataBulanan,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+            },
+          });
+        });
+
+      // ==================== CARD ====================
+
+      // mingguan
+      fetch("http://localhost:3000/api/mingguan")
+        .then((res) => res.json())
+        .then((data) => {
+          document.getElementById("mingguan").innerText = data.total || 0;
+        });
+
+      // top user
+      fetch("http://localhost:3000/api/top-user")
+        .then((res) => res.json())
+        .then((data) => {
+          document.getElementById("topUser").innerText =
+            data.nama + " (" + data.total + ")";
+        });
+
+      function getSalam() {
+        const jam = new Date().getHours();
+
+        if (jam >= 4 && jam < 11) return "Selamat Pagi";
+        if (jam >= 11 && jam < 15) return "Selamat Siang";
+        if (jam >= 15 && jam < 18) return "Selamat Sore";
+        return "Selamat Malam";
+      }
+
+      function tampilkanUser() {
+        const nama = localStorage.getItem("nama") || "User";
+        const salam = getSalam();
+
+        document.getElementById("salamUser").innerText = `${salam}, ${nama} 👋`;
+      }
+
+      // jalankan
+      tampilkanUser();
+    </script>
+  </body>
+</html>

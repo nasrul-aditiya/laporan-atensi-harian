@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial;
+        background: #f4f6f8;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .login-box {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        width: 320px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #2c3e50;
+      }
+
+      h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #555;
+        font-weight: normal;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+      }
+
+      input:focus {
+        border-color: #3498db;
+        outline: none;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        background: #3498db;
+        border: none;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      button:hover {
+        opacity: 0.9;
+      }
+
+      .footer {
+        margin-top: 12px;
+        font-size: 12px;
+        color: #999;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="login-box">
+      <div class="title">📊 Sistem Laporan Atensi</div>
+      <h3>Silakan Login</h3>
+
+      <!-- FORM (INI KUNCINYA UNTUK ENTER) -->
+      <form
+        onsubmit="
+          login();
+          return false;
+        "
+      >
+        <input type="text" id="username" placeholder="Username" required />
+        <input type="password" id="password" placeholder="Password" required />
+
+        <button type="submit">Masuk</button>
+      </form>
+
+      <div class="footer">Silakan login untuk melanjutkan</div>
+    </div>
+
+    <script>
+      function login() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        fetch("http://localhost:3000/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.token) {
+              localStorage.setItem("token", data.token);
+              localStorage.setItem("role", data.user.role);
+              localStorage.setItem("nama", data.user.nama);
+
+              if (data.user.role === "admin") {
+                window.location.href = "dashboard.html";
+              } else {
+                window.location.href = "index.html";
+              }
+            } else {
+              alert("Login gagal");
+            }
+          });
+      }
+
+      // auto redirect kalau sudah login
+      if (localStorage.getItem("token")) {
+        const role = localStorage.getItem("role");
+
+        if (role === "admin") {
+          window.location.href = "dashboard.html";
+        } else {
+          window.location.href = "index.html";
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manajemen User</title>
+
+  <script src="auth.js"></script>
+  <link rel="stylesheet" href="sweetalert2.min.css">
+  <script src="sweetalert2.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background: #3498db;
+      color: white;
+    }
+
+    button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+      margin-right: 5px;
+    }
+
+    .edit { background: #f39c12; }
+    .hapus { background: #e74c3c; }
+    .back { background: #3498db; margin-top: 10px; }
+  </style>
+
+  <script>
+    cekLogin();
+
+    if (localStorage.getItem("role") !== "admin") {
+      Swal.fire({
+        icon: "error",
+        title: "Akses ditolak"
+      }).then(() => {
+        window.location.href = "index.html";
+      });
+    }
+  </script>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>👥 Manajemen User</h2>
+
+  <button class="back" onclick="window.location.href='dashboard.html'">⬅️ Kembali</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Jabatan</th>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="tabelUser"></tbody>
+  </table>
+</div>
+
+<script>
+function loadUser() {
+  fetch("http://localhost:3000/api/user", {
+    headers: {
+      "Authorization": localStorage.getItem("token")
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    let html = "";
+
+    data.forEach(u => {
+      html += `
+        <tr>
+          <td>${u.nama}</td>
+          <td>${u.jabatan}</td>
+          <td>${u.username}</td>
+          <td>${u.role}</td>
+          <td>
+            <button class="edit" onclick="editUser(${u.id}, '${u.nama}', '${u.jabatan}', '${u.username}', '${u.role}')">Edit</button>
+            <button class="hapus" onclick="hapusUser(${u.id})">Hapus</button>
+          </td>
+        </tr>
+      `;
+    });
+
+    document.getElementById("tabelUser").innerHTML = html;
+  });
+}
+
+// ================= DELETE =================
+function hapusUser(id) {
+  Swal.fire({
+    title: "Yakin hapus?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Ya"
+  }).then(result => {
+    if (result.isConfirmed) {
+      fetch(`http://localhost:3000/api/user/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": localStorage.getItem("token")
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        Swal.fire("Berhasil", data.message, "success");
+        loadUser();
+      });
+    }
+  });
+}
+
+// ================= EDIT =================
+function editUser(id, nama, jabatan, username, role) {
+  Swal.fire({
+    title: "Edit User",
+    width: 500,
+    html: `
+      <style>
+        .form-row {
+          display: flex;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+        .form-row label {
+          width: 120px;
+          font-weight: bold;
+        }
+        .form-row input,
+        .form-row select {
+          flex: 1;
+          padding: 6px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        }
+      </style>
+
+      <div>
+
+        <div class="form-row">
+          <label>Nama</label>
+          <input id="swal_nama" value="${nama}">
+        </div>
+
+        <div class="form-row">
+          <label>Jabatan</label>
+          <input id="swal_jabatan" value="${jabatan}">
+        </div>
+
+        <div class="form-row">
+          <label>Username</label>
+          <input id="swal_username" value="${username}">
+        </div>
+
+        <div class="form-row">
+          <label>Role</label>
+          <select id="swal_role">
+            <option value="user" ${role=="user"?"selected":""}>User</option>
+            <option value="admin" ${role=="admin"?"selected":""}>Admin</option>
+          </select>
+        </div>
+
+      </div>
+    `,
+
+    showCancelButton: true,
+    confirmButtonText: "💾 Simpan",
+    cancelButtonText: "❌ Batal",
+
+    preConfirm: () => {
+      return {
+        nama: document.getElementById("swal_nama").value,
+        jabatan: document.getElementById("swal_jabatan").value,
+        username: document.getElementById("swal_username").value,
+        role: document.getElementById("swal_role").value
+      };
+    }
+  }).then(result => {
+    if (result.isConfirmed) {
+      fetch(`http://localhost:3000/api/user/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": localStorage.getItem("token")
+        },
+        body: JSON.stringify(result.value)
+      })
+      .then(res => res.json())
+      .then(data => {
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil",
+          text: data.message
+        });
+        loadUser();
+      });
+    }
+  });
+}
+
+loadUser();
+</script>
+
+</body>
+</html>
