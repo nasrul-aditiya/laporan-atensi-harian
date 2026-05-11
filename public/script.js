@@ -49,17 +49,24 @@ function copyLaporan() {
 function toggleInput(medsos, index) {
   const checkbox = document.getElementById(medsos + index);
 
-  // kapital huruf pertama saja
+  // Membuat ID input otomatis
   const inputId =
     "link" + medsos.charAt(0).toUpperCase() + medsos.slice(1) + index;
+
   const input = document.getElementById(inputId);
 
   if (checkbox.checked) {
     input.disabled = false;
+    input.style.background = "#ffffff";
+    input.style.cursor = "text";
+    input.style.opacity = "1";
     input.focus();
   } else {
     input.disabled = true;
     input.value = "";
+    input.style.background = "#f1f3f5";
+    input.style.cursor = "not-allowed";
+    input.style.opacity = "0.7";
   }
 }
 
@@ -71,33 +78,109 @@ function buatInputPostingan() {
 
   for (let i = 1; i <= jumlah; i++) {
     container.innerHTML += `
-        <fieldset style="margin-bottom:15px">
-            <legend>Postingan ${i}</legend>
+      <div class="posting-card">
 
-            <label>Judul Konten</label><br>
-            <input type="text" id="judul${i}" style="width:400px"><br><br>
+        <div class="posting-header">
+          <i class="fa-solid fa-file-lines"></i>
+          Postingan ${i}
+        </div>
 
-            <input type="checkbox" id="ig${i}" checked
-                   onchange="toggleInput('ig',${i})"> Instagram<br>
-            <input type="text" id="linkIg${i}" placeholder="Link Instagram"
-                   style="width:400px"><br><br>
+        <div class="form-group">
+          <label>Judul Konten</label>
 
-            <input type="checkbox" id="fb${i}" checked
-                   onchange="toggleInput('fb',${i})"> Facebook<br>
-            <input type="text" id="linkFb${i}" placeholder="Link Facebook"
-                   style="width:400px"><br><br>
+          <div class="input-box">
+            <i class="fa-solid fa-pen"></i>
 
-            <input type="checkbox" id="x${i}" checked
-                   onchange="toggleInput('x',${i})"> X / Twitter<br>
-            <input type="text" id="linkX${i}" placeholder="Link X / Twitter"
-                   style="width:400px"><br><br>
+            <input
+              type="text"
+              id="judul${i}"
+              placeholder="Masukkan judul konten"
+            />
+          </div>
+        </div>
 
-            <input type="checkbox" id="tt${i}" checked
-                   onchange="toggleInput('tt',${i})"> TikTok<br>
-            <input type="text" id="linkTt${i}" placeholder="Link TikTok"
-                   style="width:400px"><br>
-        </fieldset>
-        `;
+        <div class="platform-grid">
+
+          <div class="platform-item">
+            <label>
+              <input
+                type="checkbox"
+                id="ig${i}"
+                checked
+                onchange="toggleInput('ig',${i})"
+              />
+              Instagram
+            </label>
+
+            <input
+              type="text"
+              id="linkIg${i}"
+              placeholder="Link Instagram"
+            />
+          </div>
+
+          <div class="platform-item">
+            <label>
+              <input
+                type="checkbox"
+                id="fb${i}"
+                checked
+                onchange="toggleInput('fb',${i})"
+              />
+              Facebook
+            </label>
+
+            <input
+              type="text"
+              id="linkFb${i}"
+              placeholder="Link Facebook"
+            />
+          </div>
+
+          <div class="platform-item">
+            <label>
+              <input
+                type="checkbox"
+                id="x${i}"
+                checked
+                onchange="toggleInput('x',${i})"
+              />
+              X / Twitter
+            </label>
+
+            <input
+              type="text"
+              id="linkX${i}"
+              placeholder="Link X / Twitter"
+            />
+          </div>
+
+          <div class="platform-item">
+            <label>
+              <input
+                type="checkbox"
+                id="tt${i}"
+                checked
+                onchange="toggleInput('tt',${i})"
+              />
+              TikTok
+            </label>
+
+            <input
+              type="text"
+              id="linkTt${i}"
+              placeholder="Link TikTok"
+            />
+          </div>
+
+        </div>
+      </div>
+    `;
+    // Sinkron status checkbox saat pertama load
+    toggleInput("ig", i);
+    toggleInput("fb", i);
+    toggleInput("x", i);
+    toggleInput("tt", i);
   }
 }
 

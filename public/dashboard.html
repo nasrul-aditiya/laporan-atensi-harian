@@ -1,165 +1,600 @@
 <!doctype html>
-<html>
+<html lang="id">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard Admin</title>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="sweetalert2.min.css" />
     <script src="sweetalert2.min.js"></script>
     <script src="auth.js"></script>
 
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+
     <style>
-      body {
-        font-family: Arial;
-        background: #f4f6f8;
+      * {
         margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f9;
+        display: flex;
+        color: #566a7f;
+      }
+
+      /* ================= SIDEBAR ================= */
+      .sidebar {
+        width: 260px;
+        height: 100vh;
+        background: white;
+        padding: 20px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        border-right: 1px solid #eaeaea;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+      }
+
+      .logo img {
+        width: 45px;
+        height: 45px;
+        object-fit: contain;
+      }
+
+      .logo h3 {
+        color: #566a7f;
+        font-size: 22px;
+      }
+
+      .menu-title {
+        font-size: 12px;
+        color: #a1acb8;
+        margin: 25px 0 10px;
+        text-transform: uppercase;
+      }
+
+      .menu a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        text-decoration: none;
+        color: #697a8d;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        transition: 0.3s;
+      }
+
+      .menu a:hover,
+      .menu a.active {
+        background: rgba(105, 108, 255, 0.16);
+        color: #696cff;
+      }
+
+      .upgrade-box {
+        margin-top: 30px;
+        background: #f5f5f9;
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .upgrade-box button {
+        margin-top: 15px;
+        border: none;
+        background: #696cff;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+
+      /* ================= MAIN ================= */
+      .main {
+        margin-left: 260px;
+        width: calc(100% - 260px);
         padding: 20px;
       }
 
-      .header {
+      /* TOPBAR */
+      .topbar {
+        background: white;
+        border-radius: 16px;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
+      }
+
+      .search-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #a1acb8;
+        width: 300px;
+      }
+
+      .search-box input {
+        border: none;
+        outline: none;
+        width: 100%;
+        font-size: 14px;
+      }
+
+      .top-icons {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 18px;
+      }
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #696cff;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .profile-menu {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        width: 240px;
+        overflow: hidden;
+        display: none;
+        z-index: 999;
+        border: 1px solid #ebeef0;
+      }
+
+      .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px;
+        border-bottom: 1px solid #ebeef0;
+      }
+
+      .profile-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: #696cff;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+        position: relative;
+      }
+
+      .profile-avatar::after {
+        content: "";
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 12px;
+        height: 12px;
+        background: #28c76f;
+        border: 2px solid white;
+        border-radius: 50%;
+      }
+
+      .profile-info h4 {
+        margin: 0;
+        color: #566a7f;
+        font-size: 16px;
+      }
+
+      .profile-info p {
+        margin-top: 4px;
+        color: #a1acb8;
+        font-size: 14px;
+      }
+
+      .profile-menu-content {
+        padding: 12px;
+      }
+
+      .profile-menu.active {
+        display: block;
+      }
+
+      .profile-menu button {
+        width: 100%;
+        border: none;
+        background: transparent;
+        color: #566a7f;
+        padding: 14px 16px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 15px;
+        transition: 0.3s;
+      }
+
+      .profile-menu button:hover {
+        background: #f5f5f9;
+        color: #ea5455;
+      }
+
+      /* ================= HERO ================= */
+      .hero {
+        margin-top: 25px;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
+      }
+
+      .hero h1 {
+        color: #696cff;
+        margin-bottom: 15px;
+        font-size: 34px;
+      }
+
+      .hero p {
+        color: #697a8d;
+        line-height: 1.6;
+      }
+
+      .hero button {
+        margin-top: 20px;
+        border: none;
+        background: rgba(105, 108, 255, 0.15);
+        color: #696cff;
+        padding: 12px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .hero img {
+        width: 250px;
+      }
+
+      /* ================= STATS ================= */
+      .stats-grid {
+        margin-top: 25px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
+      }
+
+      .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        font-size: 22px;
+      }
+
+      .purple {
+        background: rgba(105, 108, 255, 0.15);
+        color: #696cff;
+      }
+
+      .green {
+        background: rgba(40, 199, 111, 0.15);
+        color: #28c76f;
+      }
+
+      .orange {
+        background: rgba(255, 159, 67, 0.15);
+        color: #ff9f43;
+      }
+
+      .red {
+        background: rgba(234, 84, 85, 0.15);
+        color: #ea5455;
+      }
+
+      .stat-card h4 {
+        color: #a1acb8;
+        margin-bottom: 8px;
+        font-weight: normal;
+      }
+
+      .stat-card h2 {
+        color: #566a7f;
+        margin-bottom: 10px;
+      }
+
+      .up {
+        color: #28c76f;
+        font-size: 14px;
+      }
+
+      /* ================= CHART ================= */
+      .chart-section {
+        margin-top: 25px;
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
+      }
+
+      .chart-title {
+        margin-bottom: 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
 
-      .btn {
-        padding: 8px 12px;
-        border: none;
-        border-radius: 5px;
-        color: white;
-        cursor: pointer;
-        margin-left: 5px;
+      .chart-title h3 {
+        color: #566a7f;
       }
 
-      .btn-user {
-        background: #9b59b6;
+      canvas {
+        width: 100% !important;
+        height: 400px !important;
       }
 
-      .btn-laporan {
-        background: #9b59b6;
-      }
-      .logout {
-        background: red;
-      }
-      .tambah {
-        background: #3498db;
-      }
-
-      .card-container {
+      /* ================= BUTTON ACTION ================= */
+      .action-buttons {
+        margin-top: 25px;
         display: flex;
         gap: 15px;
-        margin-top: 20px;
         flex-wrap: wrap;
       }
 
-      .card {
-        flex: 1;
-        min-width: 200px;
-        padding: 20px;
-        border-radius: 10px;
+      .btn {
+        border: none;
+        padding: 14px 20px;
+        border-radius: 12px;
         color: white;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-      }
-
-      .blue {
-        background: #3498db;
-      }
-      .green {
-        background: #2ecc71;
-      }
-      .orange {
-        background: #f39c12;
-      }
-
-      .card h3 {
-        margin: 0;
-        font-size: 15px;
-      }
-
-      .card p {
-        font-size: 26px;
-        margin-top: 10px;
+        cursor: pointer;
         font-weight: bold;
+        transition: 0.3s;
       }
 
-      .chart-box {
-        background: white;
-        margin-top: 20px;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn-purple {
+        background: #696cff;
+      }
+
+      .btn-green {
+        background: #28c76f;
+      }
+
+      .btn-orange {
+        background: #ff9f43;
+      }
+
+      .btn-red {
+        background: #ea5455;
+      }
+
+      /* ================= RESPONSIVE ================= */
+      @media (max-width: 900px) {
+        .sidebar {
+          display: none;
+        }
+
+        .main {
+          margin-left: 0;
+          width: 100%;
+        }
+
+        .hero {
+          flex-direction: column;
+          text-align: center;
+          gap: 20px;
+        }
+
+        .hero img {
+          width: 180px;
+        }
       }
     </style>
-
-    <script>
-      cekLogin();
-
-      if (localStorage.getItem("role") !== "admin") {
-        alert("Akses ditolak!");
-        window.location.href = "login.html";
-      }
-    </script>
   </head>
 
   <body>
-    <div class="header">
-      <div>
-        <h2>📊 Dashboard Admin</h2>
-        <small id="salamUser" style="color: #555"></small>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="logo.png" alt="Logo" />
+
+        <h3>Laporan Atensi Harian</h3>
       </div>
 
-      <div>
-        <button
-          class="btn tambah"
-          onclick="window.location.href = 'tambah-user.html'"
-        >
-          + User
-        </button>
-        <button
-          class="btn btn-user"
-          onclick="window.location.href = 'user.html'"
-        >
-          👥 Manajemen User
-        </button>
-        <button
-          class="btn btn-laporan"
-          onclick="window.location.href = 'laporan.html'"
-        >
-          📊 Manajemen Laporan
-        </button>
-        <button class="btn logout" onclick="logout()">Logout</button>
-      </div>
-    </div>
+      <div class="menu">
+        <a href="#" class="active">
+          <i class="fa-solid fa-house"></i>
+          Dashboard
+        </a>
 
-    <!-- CARD -->
-    <div class="card-container">
-      <div class="card blue">
-        <h3>Postingan Minggu Ini</h3>
-        <p id="mingguan">0</p>
+        <div class="menu-title">Management</div>
+
+        <a href="index.html">
+          <i class="fa-solid fa-file-pen"></i>
+          Buat Laporan
+        </a>
+
+        <!-- MENU KHUSUS ADMIN -->
+        <div id="adminMenu">
+          <a href="user.html">
+            <i class="fa-solid fa-users"></i>
+            Manajemen User
+          </a>
+
+          <a href="laporan.html">
+            <i class="fa-solid fa-chart-column"></i>
+            Manajemen Laporan
+          </a>
+
+          <a href="tambah-user.html">
+            <i class="fa-solid fa-user-plus"></i>
+            Tambah User
+          </a>
+        </div>
+
+        <!-- MENU USER BIASA -->
+        <div id="userMenu">
+          <a href="laporan.html">
+            <i class="fa-solid fa-chart-column"></i>
+            Manajemen Laporan
+          </a>
+        </div>
+
+        <div class="menu-title">System</div>
+
+        <a href="#" onclick="logout()">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div></div>
+
+        <div class="top-icons">
+          <div style="position: relative">
+            <div class="avatar" id="avatarUser" onclick="toggleProfileMenu()">
+              A
+            </div>
+
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">A</div>
+
+                <div class="profile-info">
+                  <h4 id="profileName">Admin</h4>
+                  <p id="profileRole">Administrator</p>
+                </div>
+              </div>
+
+              <div class="profile-menu-content">
+                <button onclick="logout()">
+                  <i class="fa-solid fa-power-off"></i>
+                  Log Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="card green">
-        <h3>User Teraktif</h3>
-        <p id="topUser">-</p>
+      <!-- HERO -->
+      <div class="hero">
+        <div>
+          <h1 id="judulHero">Selamat Datang Admin 👋</h1>
+          <p id="salamUser">
+            Sistem monitoring laporan atensi harian berbasis website.
+          </p>
+        </div>
+
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png"
+          alt="admin"
+        />
       </div>
 
-      <div class="card orange">
-        <h3>Total Laporan</h3>
-        <p id="total">0</p>
-      </div>
-    </div>
+      <!-- STATISTIC -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon purple">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
 
-    <!-- GRAFIK -->
-    <div class="chart-box">
-      <canvas id="grafik" height="500"></canvas>
-    </div>
+          <h4>Postingan Minggu Ini</h4>
+          <h2 id="mingguan">0</h2>
+          <div class="up">↑ Aktivitas meningkat</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <i class="fa-solid fa-user"></i>
+          </div>
+
+          <h4>User Teraktif</h4>
+          <h2 id="topUser">-</h2>
+          <div class="up">↑ User paling aktif</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon orange">
+            <i class="fa-solid fa-file-lines"></i>
+          </div>
+
+          <h4>Total Laporan</h4>
+          <h2 id="total">0</h2>
+          <div class="up">↑ Total keseluruhan</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon red">
+            <i class="fa-solid fa-server"></i>
+          </div>
+
+          <h4>Status Sistem</h4>
+          <h2>Online</h2>
+          <div class="up">↑ Server berjalan normal</div>
+        </div>
+      </div>
+
+      <!-- CHART -->
+      <div class="chart-section">
+        <div class="chart-title">
+          <h3>Total Statistik Laporan</h3>
+        </div>
+
+        <canvas id="grafik"></canvas>
+      </div>
+    </main>
 
     <script>
-      // ==================== GRAFIK (cara lama) ====================
+      // ==================== GRAFIK ====================
       fetch("http://localhost:3000/api/grafik")
         .then((res) => res.json())
         .then((data) => {
-          console.log("grafik:", data);
-
           const bulanLabel = [
             "Jan",
             "Feb",
@@ -175,15 +610,12 @@
             "Des",
           ];
 
-          // buat array default 12 bulan isi 0
           let dataBulanan = new Array(12).fill(0);
 
-          // isi data dari database
           data.forEach((d) => {
             dataBulanan[d.bulan - 1] = d.total;
           });
 
-          // total laporan
           const total = dataBulanan.reduce((a, b) => a + b, 0);
           document.getElementById("total").innerText = total;
 
@@ -195,26 +627,30 @@
                 {
                   label: "Jumlah Laporan",
                   data: dataBulanan,
+                  backgroundColor: "rgba(105,108,255,0.8)",
+                  borderRadius: 10,
                 },
               ],
             },
             options: {
               responsive: true,
               maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+              },
             },
           });
         });
 
       // ==================== CARD ====================
-
-      // mingguan
       fetch("http://localhost:3000/api/mingguan")
         .then((res) => res.json())
         .then((data) => {
           document.getElementById("mingguan").innerText = data.total || 0;
         });
 
-      // top user
       fetch("http://localhost:3000/api/top-user")
         .then((res) => res.json())
         .then((data) => {
@@ -232,14 +668,52 @@
       }
 
       function tampilkanUser() {
-        const nama = localStorage.getItem("nama") || "User";
+        const nama = localStorage.getItem("nama") || "Admin";
         const salam = getSalam();
 
-        document.getElementById("salamUser").innerText = `${salam}, ${nama} 👋`;
+        document.getElementById("salamUser").innerText =
+          `${salam}, ${nama}. Selamat datang di sistem dashboard monitoring laporan.`;
+
+        document.getElementById("judulHero").innerText = `${salam}, ${nama} 👋`;
+
+        const inisial = nama.charAt(0).toUpperCase();
+
+        document.getElementById("avatarUser").innerText = inisial;
+        document.getElementById("profileAvatar").innerText = inisial;
+        document.getElementById("profileName").innerText = nama;
+
+        const role = localStorage.getItem("role") || "Admin";
+        document.getElementById("profileRole").innerText = role;
       }
 
-      // jalankan
+      function toggleProfileMenu() {
+        document.getElementById("profileMenu").classList.toggle("active");
+      }
+
+      window.addEventListener("click", function (e) {
+        const avatar = document.getElementById("avatarUser");
+        const menu = document.getElementById("profileMenu");
+
+        if (!avatar.contains(e.target) && !menu.contains(e.target)) {
+          menu.classList.remove("active");
+        }
+      });
+
       tampilkanUser();
+
+      function aturMenuByRole() {
+        const role = localStorage.getItem("role");
+
+        // jika bukan admin
+        if (role !== "admin") {
+          document.getElementById("adminMenu").style.display = "none";
+        } else {
+          document.getElementById("userMenu").style.display = "none";
+        }
+      }
+
+      aturMenuByRole();
     </script>
   </body>
 </html>
+```
