@@ -1,100 +1,223 @@
 <!doctype html>
-<html>
+<html lang="id">
   <head>
-    <title>Login</title>
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <title>Login - Sistem Laporan Atensi</title>
+
+    <!-- FONT AWESOME -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+
+    <!-- SWEET ALERT -->
+    <link rel="stylesheet" href="sweetalert2.min.css" />
+    <script src="sweetalert2.min.js"></script>
+
     <style>
-      body {
+      * {
         margin: 0;
-        font-family: Arial;
-        background: #f4f6f8;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .login-box {
-        background: white;
-        padding: 25px;
-        border-radius: 10px;
-        width: 320px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-      }
-
-      .title {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 5px;
-        color: #2c3e50;
-      }
-
-      h3 {
-        margin-top: 0;
-        margin-bottom: 20px;
-        color: #555;
-        font-weight: normal;
-      }
-
-      input {
-        width: 100%;
-        padding: 10px;
-        margin: 8px 0;
-        border: 1px solid #ccc;
-        border-radius: 6px;
+        padding: 0;
         box-sizing: border-box;
       }
 
-      input:focus {
-        border-color: #3498db;
-        outline: none;
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f9;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: #566a7f;
       }
 
-      button {
+      .login-wrapper {
         width: 100%;
-        padding: 10px;
-        margin-top: 10px;
-        background: #3498db;
-        border: none;
-        color: white;
-        border-radius: 6px;
-        cursor: pointer;
+        max-width: 420px;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: 24px;
+        padding: 35px;
+        box-shadow: 0 8px 30px rgba(67, 89, 113, 0.12);
+      }
+
+      .logo-box {
+        width: 80px;
+        height: 80px;
+        background: rgba(105, 108, 255, 0.15);
+        color: #696cff;
+        border-radius: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+        margin-bottom: 25px;
+        font-size: 34px;
+      }
+
+      .title {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 28px;
+        color: #566a7f;
+        font-weight: bold;
+      }
+
+      .subtitle {
+        text-align: center;
+        color: #a1acb8;
+        margin-bottom: 30px;
+        line-height: 1.5;
         font-size: 14px;
       }
 
-      button:hover {
-        opacity: 0.9;
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #566a7f;
+      }
+
+      .input-box {
+        position: relative;
+      }
+
+      .input-box i {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        color: #a1acb8;
+      }
+
+      .input-box input {
+        width: 100%;
+        padding: 14px 14px 14px 45px;
+        border: 1px solid #d9dee3;
+        border-radius: 14px;
+        outline: none;
+        font-size: 14px;
+        transition: 0.3s;
+      }
+
+      .input-box input:focus {
+        border-color: #696cff;
+        box-shadow: 0 0 0 4px rgba(105, 108, 255, 0.15);
+      }
+
+      .btn-login {
+        width: 100%;
+        border: none;
+        background: #696cff;
+        color: white;
+        padding: 15px;
+        border-radius: 14px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: bold;
+        transition: 0.3s;
+        margin-top: 10px;
+      }
+
+      .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(105, 108, 255, 0.25);
       }
 
       .footer {
-        margin-top: 12px;
-        font-size: 12px;
-        color: #999;
+        margin-top: 25px;
         text-align: center;
+        font-size: 13px;
+        color: #a1acb8;
+      }
+
+      .footer strong {
+        color: #696cff;
+      }
+
+      @media (max-width: 500px) {
+        .login-card {
+          padding: 25px;
+          border-radius: 20px;
+        }
+
+        .title {
+          font-size: 24px;
+        }
       }
     </style>
   </head>
 
   <body>
-    <div class="login-box">
-      <div class="title">📊 Sistem Laporan Atensi</div>
-      <h3>Silakan Login</h3>
+    <div class="login-wrapper">
+      <div class="login-card">
+        <div class="logo-box">
+          <i class="fa-solid fa-chart-column"></i>
+        </div>
 
-      <!-- FORM (INI KUNCINYA UNTUK ENTER) -->
-      <form
-        onsubmit="
-          login();
-          return false;
-        "
-      >
-        <input type="text" id="username" placeholder="Username" required />
-        <input type="password" id="password" placeholder="Password" required />
+        <div class="title">Sistem Laporan Atensi</div>
 
-        <button type="submit">Masuk</button>
-      </form>
+        <div class="subtitle">
+          Silakan login untuk mengakses dashboard monitoring laporan atensi
+          harian.
+        </div>
 
-      <div class="footer">Silakan login untuk melanjutkan</div>
+        <!-- FORM -->
+        <form
+          onsubmit="
+            login();
+            return false;
+          "
+        >
+          <div class="input-group">
+            <label>Username</label>
+
+            <div class="input-box">
+              <i class="fa-solid fa-user"></i>
+
+              <input
+                type="text"
+                id="username"
+                placeholder="Masukkan username"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Password</label>
+
+            <div class="input-box">
+              <i class="fa-solid fa-lock"></i>
+
+              <input
+                type="password"
+                id="password"
+                placeholder="Masukkan password"
+                required
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-login">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            Masuk
+          </button>
+        </form>
+
+        <div class="footer">
+          © 2026 <strong>Sistem Laporan Atensi Harian</strong>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -104,9 +227,11 @@
 
         fetch("http://localhost:3000/api/login", {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json",
           },
+
           body: JSON.stringify({
             username: username,
             password: password,
@@ -119,26 +244,37 @@
               localStorage.setItem("role", data.user.role);
               localStorage.setItem("nama", data.user.nama);
 
-              if (data.user.role === "admin") {
+              Swal.fire({
+                icon: "success",
+                title: "Login Berhasil",
+                text: "Selamat datang kembali",
+                timer: 1500,
+                showConfirmButton: false,
+              });
+
+              setTimeout(() => {
                 window.location.href = "dashboard.html";
-              } else {
-                window.location.href = "index.html";
-              }
+              }, 1500);
             } else {
-              alert("Login gagal");
+              Swal.fire({
+                icon: "error",
+                title: "Login Gagal",
+                text: "Username atau password salah",
+              });
             }
+          })
+          .catch(() => {
+            Swal.fire({
+              icon: "error",
+              title: "Terjadi Kesalahan",
+              text: "Server tidak dapat dihubungi",
+            });
           });
       }
 
-      // auto redirect kalau sudah login
+      // AUTO REDIRECT JIKA SUDAH LOGIN
       if (localStorage.getItem("token")) {
-        const role = localStorage.getItem("role");
-
-        if (role === "admin") {
-          window.location.href = "dashboard.html";
-        } else {
-          window.location.href = "index.html";
-        }
+        window.location.href = "dashboard.html";
       }
     </script>
   </body>

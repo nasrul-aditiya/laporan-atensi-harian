@@ -400,15 +400,6 @@
 
     <script>
       cekLogin();
-
-      if (localStorage.getItem("role") !== "admin") {
-        Swal.fire({
-          icon: "error",
-          title: "Akses ditolak",
-        }).then(() => {
-          window.location.href = "index.html";
-        });
-      }
     </script>
   </head>
 
@@ -434,7 +425,7 @@
           Buat Laporan
         </a>
 
-        <!-- MENU KHUSUS ADMIN -->
+        <!-- MENU ADMIN -->
         <div id="adminMenu">
           <a href="user.html">
             <i class="fa-solid fa-users"></i>
@@ -452,7 +443,7 @@
           </a>
         </div>
 
-        <!-- MENU USER BIASA -->
+        <!-- MENU USER -->
         <div id="userMenu">
           <a href="laporan.html" class="active">
             <i class="fa-solid fa-chart-column"></i>
@@ -628,14 +619,17 @@
                   <td>${l.jumlah_postingan}</td>
 
                   <td>
-                    <button
-                      class="action-btn view"
-                      onclick="viewLaporan(${l.id})"
-                    >
-                      <i class="fa-solid fa-eye"></i>
-                      View
-                    </button>
+                  <button
+                    class="action-btn view"
+                    onclick="viewLaporan(${l.id})"
+                  >
+                    <i class="fa-solid fa-eye"></i>
+                    View
+                  </button>
 
+                  ${
+                    roleUser === "admin"
+                      ? `
                     <button
                       class="action-btn hapus"
                       onclick="hapusLaporan(${l.id})"
@@ -643,7 +637,10 @@
                       <i class="fa-solid fa-trash"></i>
                       Hapus
                     </button>
-                  </td>
+                  `
+                      : ""
+                  }
+                </td>
                 </tr>
               `;
             });
@@ -660,6 +657,15 @@
       // ================= DELETE =================
 
       function hapusLaporan(id) {
+        if (roleUser !== "admin") {
+          Swal.fire(
+            "Akses Ditolak",
+            "Hanya admin yang dapat menghapus laporan",
+            "error",
+          );
+          return;
+        }
+
         Swal.fire({
           title: "Yakin hapus?",
           icon: "warning",
@@ -764,9 +770,7 @@ Pukul  : 14.00 - 15.00 WIB
 Tempat : Kanim Sambas
 
 III. URAIAN KEGIATAN
-${uraian}
-
-Demikian Laporan Kegiatan ini kami sampaikan, atas perhatiannya kami ucapkan terima kasih.
+${uraian}Demikian Laporan Kegiatan ini kami sampaikan, atas perhatiannya kami ucapkan terima kasih.
 
 Salam Hormat
 Kepala Kantor Imigrasi Kelas II TPI Sambas
@@ -836,7 +840,6 @@ Kepala Kantor Imigrasi Kelas II TPI Sambas
       function aturMenuByRole() {
         const role = localStorage.getItem("role");
 
-        // jika bukan admin
         if (role !== "admin") {
           document.getElementById("adminMenu").style.display = "none";
         } else {
