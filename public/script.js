@@ -24,26 +24,66 @@ function formatTanggal(tgl) {
 }
 
 function copyLaporan() {
-  const teks = document.getElementById("hasil");
+  const textarea = document.getElementById("hasil");
 
-  navigator.clipboard
-    .writeText(teks.value)
-    .then(() => {
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil",
-        text: "Laporan berhasil disalin ke clipboard",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    })
-    .catch(() => {
-      Swal.fire({
-        icon: "error",
-        title: "Gagal",
-        text: "Gagal menyalin teks",
-      });
+  // validasi
+  if (!textarea.value.trim()) {
+    Swal.fire({
+      icon: "warning",
+      title: "Peringatan",
+      text: "Belum ada laporan untuk disalin",
     });
+    return;
+  }
+
+  // METHOD MODERN
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard
+      .writeText(textarea.value)
+      .then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil",
+          text: "Laporan berhasil disalin",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      })
+      .catch(() => {
+        fallbackCopy(textarea);
+      });
+  } else {
+    // fallback browser lama / non HTTPS
+    fallbackCopy(textarea);
+  }
+}
+
+// FALLBACK COPY
+function fallbackCopy(textarea) {
+  textarea.select();
+  textarea.setSelectionRange(0, 99999);
+
+  try {
+    document.execCommand("copy");
+
+    // hilangkan block/select
+    window.getSelection().removeAllRanges();
+    textarea.blur();
+
+    Swal.fire({
+      icon: "success",
+      title: "Berhasil",
+      text: "Laporan berhasil disalin",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+  } catch (err) {
+    Swal.fire({
+      icon: "error",
+      title: "Gagal",
+      text: "Browser tidak mendukung copy otomatis",
+    });
+  }
 }
 
 function toggleInput(medsos, index) {
@@ -441,7 +481,7 @@ function simpanLaporan() {
     cancelButtonText: "Batal",
   }).then((result) => {
     if (result.isConfirmed) {
-      fetch("http://localhost:3000/api/laporan", {
+      fetch("/api/laporan", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

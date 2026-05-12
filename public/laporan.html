@@ -591,7 +591,7 @@
         const dari = document.getElementById("dari").value;
         const sampai = document.getElementById("sampai").value;
 
-        let url = "http://localhost:3000/api/laporan";
+        let url = "/api/laporan";
 
         if (dari && sampai) {
           url += `?dari=${dari}&sampai=${sampai}`;
@@ -673,7 +673,7 @@
           confirmButtonText: "Ya",
         }).then((result) => {
           if (result.isConfirmed) {
-            fetch(`http://localhost:3000/api/laporan/${id}`, {
+            fetch(`/api/laporan/${id}`, {
               method: "DELETE",
               headers: {
                 Authorization: localStorage.getItem("token"),
@@ -726,7 +726,7 @@
       // ================= VIEW LAPORAN =================
 
       function viewLaporan(id) {
-        fetch(`http://localhost:3000/api/laporan/${id}`, {
+        fetch(`/api/laporan/${id}`, {
           headers: {
             Authorization: localStorage.getItem("token"),
           },
@@ -818,15 +818,38 @@ Kepala Kantor Imigrasi Kelas II TPI Sambas
                 container.prepend(btn);
 
                 btn.onclick = () => {
-                  const text = document.getElementById("laporanText").value;
+                  const textarea = document.getElementById("laporanText");
 
-                  navigator.clipboard.writeText(text).then(() => {
-                    Swal.fire(
-                      "Berhasil",
-                      "Laporan berhasil disalin",
-                      "success",
-                    );
-                  });
+                  textarea.select();
+                  textarea.setSelectionRange(0, 999999);
+
+                  let berhasil = false;
+
+                  try {
+                    berhasil = document.execCommand("copy");
+                  } catch (err) {
+                    berhasil = false;
+                  }
+
+                  // hilangkan blok/select setelah copy
+                  window.getSelection().removeAllRanges();
+                  textarea.blur();
+
+                  if (berhasil) {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Berhasil",
+                      text: "Laporan berhasil disalin",
+                      timer: 1500,
+                      showConfirmButton: false,
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Gagal",
+                      text: "Tidak dapat menyalin laporan",
+                    });
+                  }
                 };
               },
             });

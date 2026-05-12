@@ -592,7 +592,7 @@
 
     <script>
       // ==================== GRAFIK ====================
-      fetch("http://localhost:3000/api/grafik")
+      fetch("/api/grafik")
         .then((res) => res.json())
         .then((data) => {
           const bulanLabel = [
@@ -645,13 +645,13 @@
         });
 
       // ==================== CARD ====================
-      fetch("http://localhost:3000/api/mingguan")
+      fetch("/api/mingguan")
         .then((res) => res.json())
         .then((data) => {
           document.getElementById("mingguan").innerText = data.total || 0;
         });
 
-      fetch("http://localhost:3000/api/top-user")
+      fetch("/api/top-user")
         .then((res) => res.json())
         .then((data) => {
           document.getElementById("topUser").innerText =

@@ -486,7 +486,7 @@
       // ================= LOAD USER =================
 
       function loadUser() {
-        fetch("http://localhost:3000/api/user", {
+        fetch("/api/user", {
           headers: {
             Authorization: localStorage.getItem("token"),
           },
@@ -557,7 +557,7 @@
           cancelButtonText: "Batal",
         }).then((result) => {
           if (result.isConfirmed) {
-            fetch(`http://localhost:3000/api/user/${id}`, {
+            fetch(`/api/user/${id}`, {
               method: "DELETE",
 
               headers: {
@@ -668,7 +668,7 @@
           },
         }).then((result) => {
           if (result.isConfirmed) {
-            fetch(`http://localhost:3000/api/user/${id}`, {
+            fetch(`/api/user/${id}`, {
               method: "PUT",
 
               headers: {

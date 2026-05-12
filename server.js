@@ -20,6 +20,6 @@ app.use("/api", userRoutes);
 const laporanRoute = require("./routes/laporan");
 app.use("/api", laporanRoute);
 
-app.listen(3000, () => {
+app.listen(3000, "0.0.0.0", () => {
   console.log("Server jalan di http://localhost:3000");
 });
