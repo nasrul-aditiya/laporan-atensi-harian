@@ -10,9 +10,10 @@
     <link rel="stylesheet" href="sweetalert2.min.css" />
     <script src="sweetalert2.min.js"></script>
 
+    <!-- AUTH -->
     <script src="auth.js"></script>
 
-    <!-- Font Awesome -->
+    <!-- FONT AWESOME -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
@@ -28,8 +29,22 @@
       body {
         font-family: Arial, sans-serif;
         background: #f5f5f9;
-        display: flex;
         color: #566a7f;
+        overflow-x: hidden;
+      }
+
+      /* ================= OVERLAY ================= */
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1400;
+        display: none;
+      }
+
+      .overlay.active {
+        display: block;
       }
 
       /* ================= SIDEBAR ================= */
@@ -43,6 +58,13 @@
         left: 0;
         top: 0;
         border-right: 1px solid #ebeef0;
+        overflow-y: auto;
+        transition: 0.3s;
+        z-index: 1500;
+      }
+
+      .sidebar.active {
+        left: 0;
       }
 
       .logo {
@@ -94,6 +116,7 @@
         margin-left: 260px;
         width: calc(100% - 260px);
         padding: 20px;
+        transition: 0.3s;
       }
 
       /* ================= TOPBAR ================= */
@@ -108,12 +131,37 @@
         box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
       }
 
+      .top-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .hamburger {
+        width: 42px;
+        height: 42px;
+        border: none;
+        border-radius: 12px;
+        background: #f5f5f9;
+        color: #566a7f;
+        cursor: pointer;
+        font-size: 18px;
+        display: none;
+      }
+
+      .page-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #566a7f;
+      }
+
       .top-icons {
         display: flex;
         align-items: center;
         gap: 20px;
-        font-size: 18px;
       }
+
+      /* ================= AVATAR ================= */
 
       .avatar {
         width: 42px;
@@ -226,7 +274,8 @@
         border-radius: 20px;
         padding: 35px;
         box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
-        max-width: 700px;
+        max-width: 750px;
+        width: 100%;
       }
 
       .form-header {
@@ -241,6 +290,7 @@
 
       .form-header p {
         color: #a1acb8;
+        line-height: 1.6;
       }
 
       .form-group {
@@ -303,6 +353,7 @@
         transition: 0.3s;
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 10px;
       }
 
@@ -314,24 +365,77 @@
         background: #28c76f;
       }
 
-      .btn-back {
-        background: #696cff;
-      }
-
       /* ================= RESPONSIVE ================= */
 
       @media (max-width: 900px) {
+        .hamburger {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
         .sidebar {
-          display: none;
+          left: -280px;
+        }
+
+        .sidebar.active {
+          left: 0;
         }
 
         .main {
           margin-left: 0;
           width: 100%;
+          padding: 15px;
         }
 
         .form-card {
           max-width: 100%;
+          padding: 25px 20px;
+        }
+
+        .form-header h1 {
+          font-size: 26px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .topbar {
+          padding: 14px;
+        }
+
+        .page-title {
+          font-size: 18px;
+        }
+
+        .form-card {
+          padding: 20px 15px;
+          border-radius: 18px;
+        }
+
+        .form-header h1 {
+          font-size: 22px;
+        }
+
+        .form-header p {
+          font-size: 14px;
+        }
+
+        .input-box input,
+        .input-box select {
+          font-size: 13px;
+          padding: 13px 13px 13px 42px;
+        }
+
+        .btn-group {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+
+        .logo h3 {
+          font-size: 18px;
         }
       }
     </style>
@@ -352,13 +456,15 @@
   </head>
 
   <body>
-    <!-- ================= SIDEBAR ================= -->
+    <!-- OVERLAY -->
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+
+    <aside class="sidebar" id="sidebar">
       <div class="logo">
         <img src="logo.png" alt="Logo" />
-
         <h3>Laporan Atensi Harian</h3>
       </div>
 
@@ -375,7 +481,8 @@
           Buat Laporan
         </a>
 
-        <!-- MENU KHUSUS ADMIN -->
+        <!-- MENU ADMIN -->
+
         <div id="adminMenu">
           <a href="user.html">
             <i class="fa-solid fa-users"></i>
@@ -393,7 +500,8 @@
           </a>
         </div>
 
-        <!-- MENU USER BIASA -->
+        <!-- MENU USER -->
+
         <div id="userMenu">
           <a href="laporan.html">
             <i class="fa-solid fa-chart-column"></i>
@@ -410,13 +518,17 @@
       </div>
     </aside>
 
-    <!-- ================= MAIN ================= -->
+    <!-- MAIN -->
 
     <main class="main">
-      <!-- ================= TOPBAR ================= -->
+      <!-- TOPBAR -->
 
       <div class="topbar">
-        <div></div>
+        <div class="top-left">
+          <button class="hamburger" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
 
         <div class="top-icons">
           <div style="position: relative">
@@ -445,7 +557,7 @@
         </div>
       </div>
 
-      <!-- ================= FORM ================= -->
+      <!-- FORM -->
 
       <div class="form-card">
         <div class="form-header">
@@ -458,6 +570,7 @@
 
           <div class="input-box">
             <i class="fa-solid fa-user"></i>
+
             <input type="text" id="nama" placeholder="Masukkan nama" />
           </div>
         </div>
@@ -467,6 +580,7 @@
 
           <div class="input-box">
             <i class="fa-solid fa-briefcase"></i>
+
             <input type="text" id="jabatan" placeholder="Masukkan jabatan" />
           </div>
         </div>
@@ -476,6 +590,7 @@
 
           <div class="input-box">
             <i class="fa-solid fa-at"></i>
+
             <input type="text" id="username" placeholder="Masukkan username" />
           </div>
         </div>
@@ -485,6 +600,7 @@
 
           <div class="input-box">
             <i class="fa-solid fa-lock"></i>
+
             <input
               type="password"
               id="password"
@@ -511,22 +627,23 @@
             <i class="fa-solid fa-floppy-disk"></i>
             Simpan
           </button>
-
-          <button
-            class="btn btn-back"
-            onclick="window.location.href = 'dashboard.html'"
-          >
-            <i class="fa-solid fa-arrow-left"></i>
-            Kembali
-          </button>
         </div>
       </div>
     </main>
 
     <script>
+      // ================= SIDEBAR =================
+
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+
+        document.getElementById("overlay").classList.toggle("active");
+      }
+
       // ================= USER PROFILE =================
 
       const namaUser = localStorage.getItem("nama") || "Admin";
+
       const roleUser = localStorage.getItem("role") || "admin";
 
       const inisial = namaUser.charAt(0).toUpperCase();
@@ -542,6 +659,7 @@
 
       window.addEventListener("click", function (e) {
         const avatar = document.getElementById("avatarUser");
+
         const menu = document.getElementById("profileMenu");
 
         if (!avatar.contains(e.target) && !menu.contains(e.target)) {
@@ -553,9 +671,13 @@
 
       function tambahUser() {
         const nama = document.getElementById("nama").value.trim();
+
         const jabatan = document.getElementById("jabatan").value.trim();
+
         const username = document.getElementById("username").value.trim();
+
         const password = document.getElementById("password").value.trim();
+
         const role = document.getElementById("role").value;
 
         // VALIDASI
@@ -576,6 +698,7 @@
           title: "Menyimpan...",
           text: "Mohon tunggu",
           allowOutsideClick: false,
+
           didOpen: () => {
             Swal.showLoading();
           },
@@ -586,6 +709,7 @@
 
           headers: {
             "Content-Type": "application/json",
+
             Authorization: localStorage.getItem("token"),
           },
 
@@ -609,9 +733,13 @@
             });
 
             document.getElementById("nama").value = "";
+
             document.getElementById("jabatan").value = "";
+
             document.getElementById("username").value = "";
+
             document.getElementById("password").value = "";
+
             document.getElementById("role").value = "user";
 
             document.getElementById("nama").focus();
@@ -626,10 +754,11 @@
           });
       }
 
+      // ================= MENU ROLE =================
+
       function aturMenuByRole() {
         const role = localStorage.getItem("role");
 
-        // jika bukan admin
         if (role !== "admin") {
           document.getElementById("adminMenu").style.display = "none";
         } else {

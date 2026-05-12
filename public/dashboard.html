@@ -6,8 +6,10 @@
     <title>Dashboard Admin</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <link rel="stylesheet" href="sweetalert2.min.css" />
     <script src="sweetalert2.min.js"></script>
+
     <script src="auth.js"></script>
 
     <link
@@ -27,6 +29,7 @@
         background: #f5f5f9;
         display: flex;
         color: #566a7f;
+        overflow-x: hidden;
       }
 
       /* ================= SIDEBAR ================= */
@@ -39,6 +42,12 @@
         left: 0;
         top: 0;
         border-right: 1px solid #eaeaea;
+        z-index: 1000;
+        transition: 0.3s;
+      }
+
+      .sidebar.hide {
+        left: -260px;
       }
 
       .logo {
@@ -84,22 +93,17 @@
         color: #696cff;
       }
 
-      .upgrade-box {
-        margin-top: 30px;
-        background: #f5f5f9;
-        border-radius: 16px;
-        padding: 20px;
-        text-align: center;
+      /* ================= OVERLAY ================= */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 999;
+        display: none;
       }
 
-      .upgrade-box button {
-        margin-top: 15px;
-        border: none;
-        background: #696cff;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 10px;
-        cursor: pointer;
+      .overlay.show {
+        display: block;
       }
 
       /* ================= MAIN ================= */
@@ -107,9 +111,10 @@
         margin-left: 260px;
         width: calc(100% - 260px);
         padding: 20px;
+        transition: 0.3s;
       }
 
-      /* TOPBAR */
+      /* ================= TOPBAR ================= */
       .topbar {
         background: white;
         border-radius: 16px;
@@ -120,19 +125,22 @@
         box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
       }
 
-      .search-box {
+      .top-left {
         display: flex;
         align-items: center;
-        gap: 10px;
-        color: #a1acb8;
-        width: 300px;
+        gap: 15px;
       }
 
-      .search-box input {
+      .hamburger {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
         border: none;
-        outline: none;
-        width: 100%;
-        font-size: 14px;
+        background: #f5f5f9;
+        cursor: pointer;
+        display: none;
+        font-size: 18px;
+        color: #566a7f;
       }
 
       .top-icons {
@@ -142,6 +150,7 @@
         font-size: 18px;
       }
 
+      /* ================= AVATAR ================= */
       .avatar {
         width: 40px;
         height: 40px;
@@ -170,6 +179,10 @@
         border: 1px solid #ebeef0;
       }
 
+      .profile-menu.active {
+        display: block;
+      }
+
       .profile-header {
         display: flex;
         align-items: center;
@@ -189,39 +202,21 @@
         justify-content: center;
         font-size: 20px;
         font-weight: bold;
-        position: relative;
-      }
-
-      .profile-avatar::after {
-        content: "";
-        position: absolute;
-        bottom: 2px;
-        right: 2px;
-        width: 12px;
-        height: 12px;
-        background: #28c76f;
-        border: 2px solid white;
-        border-radius: 50%;
       }
 
       .profile-info h4 {
-        margin: 0;
-        color: #566a7f;
         font-size: 16px;
+        color: #566a7f;
       }
 
       .profile-info p {
-        margin-top: 4px;
-        color: #a1acb8;
         font-size: 14px;
+        color: #a1acb8;
+        margin-top: 4px;
       }
 
       .profile-menu-content {
         padding: 12px;
-      }
-
-      .profile-menu.active {
-        display: block;
       }
 
       .profile-menu button {
@@ -254,6 +249,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 20px;
         box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
       }
 
@@ -268,19 +264,9 @@
         line-height: 1.6;
       }
 
-      .hero button {
-        margin-top: 20px;
-        border: none;
-        background: rgba(105, 108, 255, 0.15);
-        color: #696cff;
-        padding: 12px 20px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: bold;
-      }
-
       .hero img {
         width: 250px;
+        max-width: 100%;
       }
 
       /* ================= STATS ================= */
@@ -354,64 +340,23 @@
         box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
       }
 
-      .chart-title {
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .chart-title h3 {
-        color: #566a7f;
-      }
-
       canvas {
         width: 100% !important;
         height: 400px !important;
       }
 
-      /* ================= BUTTON ACTION ================= */
-      .action-buttons {
-        margin-top: 25px;
-        display: flex;
-        gap: 15px;
-        flex-wrap: wrap;
-      }
-
-      .btn {
-        border: none;
-        padding: 14px 20px;
-        border-radius: 12px;
-        color: white;
-        cursor: pointer;
-        font-weight: bold;
-        transition: 0.3s;
-      }
-
-      .btn:hover {
-        transform: translateY(-2px);
-      }
-
-      .btn-purple {
-        background: #696cff;
-      }
-
-      .btn-green {
-        background: #28c76f;
-      }
-
-      .btn-orange {
-        background: #ff9f43;
-      }
-
-      .btn-red {
-        background: #ea5455;
-      }
-
       /* ================= RESPONSIVE ================= */
       @media (max-width: 900px) {
+        .hamburger {
+          display: block;
+        }
+
         .sidebar {
-          display: none;
+          left: -260px;
+        }
+
+        .sidebar.show {
+          left: 0;
         }
 
         .main {
@@ -422,22 +367,53 @@
         .hero {
           flex-direction: column;
           text-align: center;
-          gap: 20px;
+        }
+
+        .hero h1 {
+          font-size: 28px;
         }
 
         .hero img {
           width: 180px;
         }
       }
+
+      @media (max-width: 600px) {
+        .main {
+          padding: 15px;
+        }
+
+        .topbar {
+          padding: 12px 15px;
+        }
+
+        .hero {
+          padding: 20px;
+        }
+
+        .hero h1 {
+          font-size: 24px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        canvas {
+          height: 300px !important;
+        }
+      }
     </style>
   </head>
 
   <body>
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="logo">
         <img src="logo.png" alt="Logo" />
-
         <h3>Laporan Atensi Harian</h3>
       </div>
 
@@ -472,7 +448,7 @@
           </a>
         </div>
 
-        <!-- MENU USER BIASA -->
+        <!-- MENU USER -->
         <div id="userMenu">
           <a href="laporan.html">
             <i class="fa-solid fa-chart-column"></i>
@@ -493,7 +469,11 @@
     <main class="main">
       <!-- TOPBAR -->
       <div class="topbar">
-        <div></div>
+        <div class="top-left">
+          <button class="hamburger" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
 
         <div class="top-icons">
           <div style="position: relative">
@@ -526,6 +506,7 @@
       <div class="hero">
         <div>
           <h1 id="judulHero">Selamat Datang Admin 👋</h1>
+
           <p id="salamUser">
             Sistem monitoring laporan atensi harian berbasis website.
           </p>
@@ -582,15 +563,20 @@
 
       <!-- CHART -->
       <div class="chart-section">
-        <div class="chart-title">
-          <h3>Total Statistik Laporan</h3>
-        </div>
+        <h3 style="margin-bottom: 20px">Total Statistik Laporan</h3>
 
         <canvas id="grafik"></canvas>
       </div>
     </main>
 
     <script>
+      // ==================== SIDEBAR ====================
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("show");
+
+        document.getElementById("overlay").classList.toggle("show");
+      }
+
       // ==================== GRAFIK ====================
       fetch("/api/grafik")
         .then((res) => res.json())
@@ -617,6 +603,7 @@
           });
 
           const total = dataBulanan.reduce((a, b) => a + b, 0);
+
           document.getElementById("total").innerText = total;
 
           new Chart(document.getElementById("grafik"), {
@@ -664,11 +651,13 @@
         if (jam >= 4 && jam < 11) return "Selamat Pagi";
         if (jam >= 11 && jam < 15) return "Selamat Siang";
         if (jam >= 15 && jam < 18) return "Selamat Sore";
+
         return "Selamat Malam";
       }
 
       function tampilkanUser() {
         const nama = localStorage.getItem("nama") || "Admin";
+
         const salam = getSalam();
 
         document.getElementById("salamUser").innerText =
@@ -683,6 +672,7 @@
         document.getElementById("profileName").innerText = nama;
 
         const role = localStorage.getItem("role") || "Admin";
+
         document.getElementById("profileRole").innerText = role;
       }
 
@@ -692,6 +682,7 @@
 
       window.addEventListener("click", function (e) {
         const avatar = document.getElementById("avatarUser");
+
         const menu = document.getElementById("profileMenu");
 
         if (!avatar.contains(e.target) && !menu.contains(e.target)) {
@@ -704,7 +695,6 @@
       function aturMenuByRole() {
         const role = localStorage.getItem("role");
 
-        // jika bukan admin
         if (role !== "admin") {
           document.getElementById("adminMenu").style.display = "none";
         } else {
@@ -716,4 +706,3 @@
     </script>
   </body>
 </html>
-```

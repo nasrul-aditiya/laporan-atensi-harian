@@ -35,6 +35,21 @@
         background: #f5f5f9;
         display: flex;
         color: #566a7f;
+        overflow-x: hidden;
+      }
+
+      /* ================= OVERLAY ================= */
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 998;
+        display: none;
+      }
+
+      .overlay.show {
+        display: block;
       }
 
       /* ================= SIDEBAR ================= */
@@ -49,6 +64,12 @@
         top: 0;
         border-right: 1px solid #ebeef0;
         overflow-y: auto;
+        z-index: 999;
+        transition: 0.3s;
+      }
+
+      .sidebar.show {
+        left: 0;
       }
 
       .logo {
@@ -100,6 +121,7 @@
         margin-left: 260px;
         width: calc(100% - 260px);
         padding: 20px;
+        transition: 0.3s;
       }
 
       /* ================= TOPBAR ================= */
@@ -111,7 +133,14 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 15px;
         box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
+      }
+
+      .top-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
       }
 
       .page-title h2 {
@@ -122,6 +151,26 @@
       .page-title p {
         color: #a1acb8;
         font-size: 14px;
+      }
+
+      /* ================= HAMBURGER ================= */
+
+      .hamburger {
+        width: 42px;
+        height: 42px;
+        border: none;
+        border-radius: 10px;
+        background: #f5f5f9;
+        color: #566a7f;
+        cursor: pointer;
+        font-size: 18px;
+        display: none;
+        transition: 0.3s;
+      }
+
+      .hamburger:hover {
+        background: rgba(105, 108, 255, 0.15);
+        color: #696cff;
       }
 
       .top-icons {
@@ -362,6 +411,12 @@
         outline: none;
       }
 
+      .platform-item input[type="text"]:disabled {
+        background: #f1f3f5;
+        color: #a1acb8;
+        cursor: not-allowed;
+      }
+
       /* ================= BUTTON ================= */
 
       .btn-group {
@@ -420,8 +475,18 @@
       /* ================= RESPONSIVE ================= */
 
       @media (max-width: 900px) {
+        .hamburger {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
         .sidebar {
-          display: none;
+          left: -260px;
+        }
+
+        .sidebar.show {
+          left: 0;
         }
 
         .main {
@@ -437,18 +502,67 @@
           width: 100%;
           justify-content: center;
         }
+
+        .card {
+          padding: 20px;
+        }
       }
-      .platform-item input[type="text"]:disabled {
-        background: #f1f3f5;
-        color: #a1acb8;
-        cursor: not-allowed;
+
+      @media (max-width: 600px) {
+        .main {
+          padding: 15px;
+        }
+
+        .topbar {
+          padding: 15px;
+          flex-wrap: wrap;
+        }
+
+        .page-title h2 {
+          font-size: 20px;
+        }
+
+        .page-title p {
+          font-size: 13px;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .platform-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .posting-card {
+          padding: 18px;
+        }
+
+        textarea {
+          min-height: 350px;
+          font-size: 13px;
+        }
+
+        .card {
+          padding: 18px;
+        }
+
+        .input-box input,
+        .input-box select {
+          font-size: 13px;
+        }
       }
     </style>
   </head>
 
   <body>
+    <!-- ================= OVERLAY ================= -->
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
     <!-- ================= SIDEBAR ================= -->
-    <aside class="sidebar">
+
+    <aside class="sidebar" id="sidebar">
       <div class="logo">
         <img src="logo.png" alt="Logo" />
 
@@ -509,9 +623,16 @@
       <!-- ================= TOPBAR ================= -->
 
       <div class="topbar">
-        <div class="page-title">
-          <h2>Form Laporan Atensi</h2>
-          <p id="salamUser">Selamat datang 👋</p>
+        <div class="top-left">
+          <!-- HAMBURGER -->
+          <button class="hamburger" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="page-title">
+            <h2>Form Laporan Atensi</h2>
+            <p id="salamUser">Selamat datang 👋</p>
+          </div>
         </div>
 
         <div class="top-icons">
@@ -545,7 +666,7 @@
 
       <div class="card">
         <div class="card-title">
-          <h3>Informasi Kegiatan</h3>
+          <h3>Form Laporan Atensi</h3>
           <p>Silakan isi data laporan kegiatan harian.</p>
         </div>
 
@@ -604,6 +725,25 @@
     <script src="script.js"></script>
 
     <script>
+      // ================= SIDEBAR =================
+
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("show");
+
+        document.getElementById("overlay").classList.toggle("show");
+      }
+
+      // otomatis tutup sidebar saat klik menu di mobile
+      document.querySelectorAll(".menu a").forEach((menu) => {
+        menu.addEventListener("click", () => {
+          if (window.innerWidth <= 900) {
+            document.getElementById("sidebar").classList.remove("show");
+
+            document.getElementById("overlay").classList.remove("show");
+          }
+        });
+      });
+
       // ================= USER PROFILE =================
 
       function getSalam() {
@@ -618,16 +758,21 @@
 
       function tampilkanUser() {
         const nama = localStorage.getItem("nama") || "User";
+
         const role = localStorage.getItem("role") || "user";
 
         const salam = getSalam();
+
         const inisial = nama.charAt(0).toUpperCase();
 
         document.getElementById("salamUser").innerText = `${salam}, ${nama} 👋`;
 
         document.getElementById("avatarUser").innerText = inisial;
+
         document.getElementById("profileAvatar").innerText = inisial;
+
         document.getElementById("profileName").innerText = nama;
+
         document.getElementById("profileRole").innerText = role;
       }
 
@@ -637,6 +782,7 @@
 
       window.addEventListener("click", function (e) {
         const avatar = document.getElementById("avatarUser");
+
         const menu = document.getElementById("profileMenu");
 
         if (!avatar.contains(e.target) && !menu.contains(e.target)) {

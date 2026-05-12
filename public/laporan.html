@@ -29,7 +29,6 @@
       body {
         font-family: Arial, sans-serif;
         background: #f5f5f9;
-        display: flex;
         color: #566a7f;
       }
 
@@ -44,6 +43,13 @@
         left: 0;
         top: 0;
         border-right: 1px solid #ebeef0;
+        transition: 0.3s;
+        z-index: 1000;
+        overflow-y: auto;
+      }
+
+      .sidebar.active {
+        left: 0;
       }
 
       .logo {
@@ -89,12 +95,27 @@
         color: #696cff;
       }
 
+      /* ================= OVERLAY ================= */
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 999;
+        display: none;
+      }
+
+      .overlay.active {
+        display: block;
+      }
+
       /* ================= MAIN ================= */
 
       .main {
         margin-left: 260px;
         width: calc(100% - 260px);
         padding: 20px;
+        transition: 0.3s;
       }
 
       /* ================= TOPBAR ================= */
@@ -104,9 +125,30 @@
         border-radius: 16px;
         padding: 15px 20px;
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         align-items: center;
         box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
+        margin-bottom: 25px;
+      }
+
+      .top-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .hamburger {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: #f5f5f9;
+        color: #566a7f;
+        border: none;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
       }
 
       .avatar {
@@ -215,7 +257,6 @@
       /* ================= CONTENT ================= */
 
       .content-card {
-        margin-top: 25px;
         background: white;
         border-radius: 20px;
         padding: 30px;
@@ -292,6 +333,7 @@
         transition: 0.3s;
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 10px;
       }
 
@@ -337,6 +379,7 @@
       table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 700px;
       }
 
       th {
@@ -364,6 +407,7 @@
         color: white;
         cursor: pointer;
         margin-right: 5px;
+        margin-bottom: 5px;
         font-size: 13px;
       }
 
@@ -379,12 +423,17 @@
 
       @media (max-width: 900px) {
         .sidebar {
-          display: none;
+          left: -270px;
         }
 
         .main {
           margin-left: 0;
           width: 100%;
+          padding: 15px;
+        }
+
+        .hamburger {
+          display: flex;
         }
 
         .filter-box {
@@ -393,7 +442,39 @@
 
         .btn-search {
           width: 100%;
-          justify-content: center;
+          margin-top: 0;
+        }
+
+        .content-card {
+          padding: 20px;
+        }
+
+        .content-header h1 {
+          font-size: 24px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .topbar {
+          padding: 12px 15px;
+        }
+
+        .content-card {
+          padding: 15px;
+        }
+
+        .summary-grid {
+          grid-template-columns: 1fr;
+        }
+
+        th,
+        td {
+          padding: 12px;
+          font-size: 13px;
+        }
+
+        .action-btn {
+          width: 100%;
         }
       }
     </style>
@@ -404,11 +485,13 @@
   </head>
 
   <body>
-    <!-- ================= SIDEBAR ================= -->
-    <aside class="sidebar">
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
       <div class="logo">
         <img src="logo.png" alt="Logo" />
-
         <h3>Laporan Atensi Harian</h3>
       </div>
 
@@ -460,12 +543,16 @@
       </div>
     </aside>
 
-    <!-- ================= MAIN ================= -->
-
+    <!-- MAIN -->
     <main class="main">
-      <!-- ================= TOPBAR ================= -->
-
+      <!-- TOPBAR -->
       <div class="topbar">
+        <div class="top-left">
+          <button class="hamburger" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+
         <div style="position: relative">
           <div class="avatar" id="avatarUser" onclick="toggleProfileMenu()">
             A
@@ -491,8 +578,7 @@
         </div>
       </div>
 
-      <!-- ================= CONTENT ================= -->
-
+      <!-- CONTENT -->
       <div class="content-card">
         <div class="content-header">
           <h1>Manajemen Laporan</h1>
@@ -500,7 +586,6 @@
         </div>
 
         <!-- FILTER -->
-
         <div class="filter-box">
           <div class="input-group">
             <label>Dari Tanggal</label>
@@ -527,7 +612,6 @@
         </div>
 
         <!-- SUMMARY -->
-
         <div class="summary-grid">
           <div class="summary-card">
             <h4>Total Laporan</h4>
@@ -541,7 +625,6 @@
         </div>
 
         <!-- TABLE -->
-
         <div class="table-container">
           <table>
             <thead>
@@ -560,6 +643,13 @@
     </main>
 
     <script>
+      // ================= SIDEBAR =================
+
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("overlay").classList.toggle("active");
+      }
+
       // ================= USER PROFILE =================
 
       const namaUser = localStorage.getItem("nama") || "Admin";
@@ -619,28 +709,28 @@
                   <td>${l.jumlah_postingan}</td>
 
                   <td>
-                  <button
-                    class="action-btn view"
-                    onclick="viewLaporan(${l.id})"
-                  >
-                    <i class="fa-solid fa-eye"></i>
-                    View
-                  </button>
-
-                  ${
-                    roleUser === "admin"
-                      ? `
                     <button
-                      class="action-btn hapus"
-                      onclick="hapusLaporan(${l.id})"
+                      class="action-btn view"
+                      onclick="viewLaporan(${l.id})"
                     >
-                      <i class="fa-solid fa-trash"></i>
-                      Hapus
+                      <i class="fa-solid fa-eye"></i>
+                      View
                     </button>
-                  `
-                      : ""
-                  }
-                </td>
+
+                    ${
+                      roleUser === "admin"
+                        ? `
+                      <button
+                        class="action-btn hapus"
+                        onclick="hapusLaporan(${l.id})"
+                      >
+                        <i class="fa-solid fa-trash"></i>
+                        Hapus
+                      </button>
+                    `
+                        : ""
+                    }
+                  </td>
                 </tr>
               `;
             });
@@ -770,7 +860,7 @@ Pukul  : 14.00 - 15.00 WIB
 Tempat : Kanim Sambas
 
 III. URAIAN KEGIATAN
-${uraian}Demikian Laporan Kegiatan ini kami sampaikan, atas perhatiannya kami ucapkan terima kasih.
+${uraian}Demikian Laporan Kegiatan ini kami sampaikan.
 
 Salam Hormat
 Kepala Kantor Imigrasi Kelas II TPI Sambas
@@ -798,60 +888,6 @@ Kepala Kantor Imigrasi Kelas II TPI Sambas
               `,
 
               confirmButtonText: "Tutup",
-
-              didOpen: () => {
-                const btn = document.createElement("button");
-
-                btn.innerHTML =
-                  '<i class="fa-solid fa-copy"></i> Salin Laporan';
-
-                btn.style.marginBottom = "15px";
-                btn.style.background = "#696cff";
-                btn.style.color = "white";
-                btn.style.border = "none";
-                btn.style.padding = "12px 18px";
-                btn.style.borderRadius = "10px";
-                btn.style.cursor = "pointer";
-
-                const container = Swal.getHtmlContainer();
-
-                container.prepend(btn);
-
-                btn.onclick = () => {
-                  const textarea = document.getElementById("laporanText");
-
-                  textarea.select();
-                  textarea.setSelectionRange(0, 999999);
-
-                  let berhasil = false;
-
-                  try {
-                    berhasil = document.execCommand("copy");
-                  } catch (err) {
-                    berhasil = false;
-                  }
-
-                  // hilangkan blok/select setelah copy
-                  window.getSelection().removeAllRanges();
-                  textarea.blur();
-
-                  if (berhasil) {
-                    Swal.fire({
-                      icon: "success",
-                      title: "Berhasil",
-                      text: "Laporan berhasil disalin",
-                      timer: 1500,
-                      showConfirmButton: false,
-                    });
-                  } else {
-                    Swal.fire({
-                      icon: "error",
-                      title: "Gagal",
-                      text: "Tidak dapat menyalin laporan",
-                    });
-                  }
-                };
-              },
             });
           });
       }

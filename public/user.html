@@ -27,8 +27,22 @@
       body {
         font-family: Arial, sans-serif;
         background: #f5f5f9;
-        display: flex;
         color: #566a7f;
+        overflow-x: hidden;
+      }
+
+      /* ================= OVERLAY ================= */
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1400;
+        display: none;
+      }
+
+      .overlay.active {
+        display: block;
       }
 
       /* ================= SIDEBAR ================= */
@@ -42,6 +56,13 @@
         left: 0;
         top: 0;
         border-right: 1px solid #ebeef0;
+        overflow-y: auto;
+        transition: 0.3s;
+        z-index: 1500;
+      }
+
+      .sidebar.active {
+        left: 0;
       }
 
       .logo {
@@ -94,6 +115,7 @@
         margin-left: 260px;
         width: calc(100% - 260px);
         padding: 20px;
+        transition: 0.3s;
       }
 
       /* ================= TOPBAR ================= */
@@ -106,6 +128,31 @@
         justify-content: space-between;
         align-items: center;
         box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
+        margin-bottom: 25px;
+      }
+
+      .top-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .hamburger {
+        width: 42px;
+        height: 42px;
+        border: none;
+        border-radius: 12px;
+        background: #f5f5f9;
+        color: #566a7f;
+        cursor: pointer;
+        font-size: 18px;
+        display: none;
+      }
+
+      .page-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #566a7f;
       }
 
       .top-icons {
@@ -218,36 +265,40 @@
         color: #ea5455;
       }
 
-      /* ================= PAGE HEADER ================= */
+      /* ================= CONTENT ================= */
 
-      .page-header {
-        margin-top: 25px;
-        margin-bottom: 20px;
+      .content-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
       }
 
-      .page-header h1 {
+      .content-header {
+        margin-bottom: 25px;
+      }
+
+      .content-header h1 {
         font-size: 30px;
         color: #566a7f;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
       }
 
-      .page-header p {
+      .content-header p {
         color: #a1acb8;
       }
 
-      /* ================= TABLE CARD ================= */
+      /* ================= TABLE ================= */
 
       .table-card {
-        background: white;
-        border-radius: 20px;
-        padding: 25px;
-        box-shadow: 0 2px 10px rgba(67, 89, 113, 0.08);
+        width: 100%;
         overflow-x: auto;
       }
 
       table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 700px;
       }
 
       th {
@@ -256,6 +307,7 @@
         background: #f5f5f9;
         color: #566a7f;
         font-size: 14px;
+        white-space: nowrap;
       }
 
       td {
@@ -314,13 +366,70 @@
       /* ================= RESPONSIVE ================= */
 
       @media (max-width: 900px) {
+        .hamburger {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
         .sidebar {
-          display: none;
+          left: -280px;
+        }
+
+        .sidebar.active {
+          left: 0;
         }
 
         .main {
           margin-left: 0;
           width: 100%;
+          padding: 15px;
+        }
+
+        .content-card {
+          padding: 20px;
+        }
+
+        .content-header h1 {
+          font-size: 26px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .topbar {
+          padding: 14px;
+        }
+
+        .page-title {
+          font-size: 18px;
+        }
+
+        .content-card {
+          padding: 18px 15px;
+          border-radius: 18px;
+        }
+
+        .content-header h1 {
+          font-size: 22px;
+        }
+
+        .content-header p {
+          font-size: 14px;
+        }
+
+        th,
+        td {
+          padding: 12px;
+          font-size: 13px;
+        }
+
+        .action-btn {
+          padding: 8px 10px;
+          margin-bottom: 5px;
+        }
+
+        .logo h3 {
+          font-size: 18px;
         }
       }
     </style>
@@ -340,8 +449,13 @@
   </head>
 
   <body>
-    <!-- ================= SIDEBAR ================= -->
-    <aside class="sidebar">
+    <!-- OVERLAY -->
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar" id="sidebar">
       <div class="logo">
         <img src="logo.png" alt="Logo" />
 
@@ -362,6 +476,7 @@
         </a>
 
         <!-- MENU KHUSUS ADMIN -->
+
         <div id="adminMenu">
           <a href="user.html" class="active">
             <i class="fa-solid fa-users"></i>
@@ -379,7 +494,8 @@
           </a>
         </div>
 
-        <!-- MENU USER BIASA -->
+        <!-- MENU USER -->
+
         <div id="userMenu">
           <a href="laporan.html">
             <i class="fa-solid fa-chart-column"></i>
@@ -396,13 +512,17 @@
       </div>
     </aside>
 
-    <!-- ================= MAIN ================= -->
+    <!-- MAIN -->
 
     <main class="main">
-      <!-- ================= TOPBAR ================= -->
+      <!-- TOPBAR -->
 
       <div class="topbar">
-        <div></div>
+        <div class="top-left">
+          <button class="hamburger" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
 
         <div class="top-icons">
           <div style="position: relative">
@@ -431,43 +551,55 @@
         </div>
       </div>
 
-      <!-- ================= PAGE HEADER ================= -->
+      <!-- CONTENT -->
 
-      <div class="page-header">
-        <h1>Manajemen User</h1>
-        <p>Kelola seluruh data user pada sistem.</p>
-      </div>
+      <div class="content-card">
+        <div class="content-header">
+          <h1>Manajemen User</h1>
+          <p>Kelola seluruh data user pada sistem.</p>
+        </div>
 
-      <!-- ================= TABLE ================= -->
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
 
-      <div class="table-card">
-        <table>
-          <thead>
-            <tr>
-              <th>Nama</th>
-              <th>Jabatan</th>
-              <th>Username</th>
-              <th>Role</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-
-          <tbody id="tabelUser"></tbody>
-        </table>
+            <tbody id="tabelUser"></tbody>
+          </table>
+        </div>
       </div>
     </main>
 
     <script>
+      // ================= SIDEBAR =================
+
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+
+        document.getElementById("overlay").classList.toggle("active");
+      }
+
       // ================= PROFILE =================
 
       const namaUser = localStorage.getItem("nama") || "Admin";
+
       const roleUser = localStorage.getItem("role") || "admin";
 
       const inisial = namaUser.charAt(0).toUpperCase();
 
       document.getElementById("avatarUser").innerText = inisial;
+
       document.getElementById("profileAvatar").innerText = inisial;
+
       document.getElementById("profileName").innerText = namaUser;
+
       document.getElementById("profileRole").innerText = roleUser;
 
       function toggleProfileMenu() {
@@ -476,6 +608,7 @@
 
       window.addEventListener("click", function (e) {
         const avatar = document.getElementById("avatarUser");
+
         const menu = document.getElementById("profileMenu");
 
         if (!avatar.contains(e.target) && !menu.contains(e.target)) {
@@ -693,11 +826,11 @@
         });
       }
 
-      loadUser();
+      // ================= MENU ROLE =================
+
       function aturMenuByRole() {
         const role = localStorage.getItem("role");
 
-        // jika bukan admin
         if (role !== "admin") {
           document.getElementById("adminMenu").style.display = "none";
         } else {
@@ -706,6 +839,8 @@
       }
 
       aturMenuByRole();
+
+      loadUser();
     </script>
   </body>
 </html>
