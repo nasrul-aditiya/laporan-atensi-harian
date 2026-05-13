@@ -100,7 +100,6 @@ function toggleInput(medsos, index) {
     input.style.background = "#ffffff";
     input.style.cursor = "text";
     input.style.opacity = "1";
-    input.focus();
   } else {
     input.disabled = true;
     input.value = "";

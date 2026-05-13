@@ -582,31 +582,21 @@
           Buat Laporan
         </a>
 
-        <!-- MENU KHUSUS ADMIN -->
-        <div id="adminMenu">
-          <a href="user.html">
-            <i class="fa-solid fa-users"></i>
-            Manajemen User
-          </a>
+        <!-- KHUSUS ADMIN -->
+        <a href="user.html" class="admin-only">
+          <i class="fa-solid fa-users"></i>
+          Manajemen User
+        </a>
 
-          <a href="laporan.html">
-            <i class="fa-solid fa-chart-column"></i>
-            Manajemen Laporan
-          </a>
+        <a href="laporan.html">
+          <i class="fa-solid fa-chart-column"></i>
+          Manajemen Laporan
+        </a>
 
-          <a href="tambah-user.html">
-            <i class="fa-solid fa-user-plus"></i>
-            Tambah User
-          </a>
-        </div>
-
-        <!-- MENU USER BIASA -->
-        <div id="userMenu">
-          <a href="laporan.html">
-            <i class="fa-solid fa-chart-column"></i>
-            Manajemen Laporan
-          </a>
-        </div>
+        <a href="tambah-user.html" class="admin-only">
+          <i class="fa-solid fa-user-plus"></i>
+          Tambah User
+        </a>
 
         <div class="menu-title">System</div>
 
@@ -628,11 +618,6 @@
           <button class="hamburger" onclick="toggleSidebar()">
             <i class="fa-solid fa-bars"></i>
           </button>
-
-          <div class="page-title">
-            <h2>Form Laporan Atensi</h2>
-            <p id="salamUser">Selamat datang 👋</p>
-          </div>
         </div>
 
         <div class="top-icons">
@@ -795,11 +780,10 @@
       function aturMenuByRole() {
         const role = localStorage.getItem("role");
 
-        // jika bukan admin
         if (role !== "admin") {
-          document.getElementById("adminMenu").style.display = "none";
-        } else {
-          document.getElementById("userMenu").style.display = "none";
+          document.querySelectorAll(".admin-only").forEach((item) => {
+            item.style.display = "none";
+          });
         }
       }
 
