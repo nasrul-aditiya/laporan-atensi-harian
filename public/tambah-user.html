@@ -32,6 +32,9 @@
         color: #566a7f;
         overflow-x: hidden;
       }
+      .swal2-container {
+        z-index: 99999 !important;
+      }
 
       /* ================= OVERLAY ================= */
 
@@ -461,10 +464,10 @@
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
     <!-- SIDEBAR -->
-
     <aside class="sidebar" id="sidebar">
       <div class="logo">
         <img src="logo.png" alt="Logo" />
+
         <h3>Laporan Atensi Harian</h3>
       </div>
 
@@ -481,33 +484,21 @@
           Buat Laporan
         </a>
 
-        <!-- MENU ADMIN -->
+        <!-- KHUSUS ADMIN -->
+        <a href="user.html" class="admin-only">
+          <i class="fa-solid fa-users"></i>
+          Manajemen User
+        </a>
 
-        <div id="adminMenu">
-          <a href="user.html">
-            <i class="fa-solid fa-users"></i>
-            Manajemen User
-          </a>
+        <a href="laporan.html">
+          <i class="fa-solid fa-chart-column"></i>
+          Manajemen Laporan
+        </a>
 
-          <a href="laporan.html">
-            <i class="fa-solid fa-chart-column"></i>
-            Manajemen Laporan
-          </a>
-
-          <a href="tambah-user.html" class="active">
-            <i class="fa-solid fa-user-plus"></i>
-            Tambah User
-          </a>
-        </div>
-
-        <!-- MENU USER -->
-
-        <div id="userMenu">
-          <a href="laporan.html">
-            <i class="fa-solid fa-chart-column"></i>
-            Manajemen Laporan
-          </a>
-        </div>
+        <a href="tambah-user.html" class="admin-only active">
+          <i class="fa-solid fa-user-plus"></i>
+          Tambah User
+        </a>
 
         <div class="menu-title">System</div>
 
@@ -753,16 +744,13 @@
             });
           });
       }
-
-      // ================= MENU ROLE =================
-
       function aturMenuByRole() {
         const role = localStorage.getItem("role");
 
         if (role !== "admin") {
-          document.getElementById("adminMenu").style.display = "none";
-        } else {
-          document.getElementById("userMenu").style.display = "none";
+          document.querySelectorAll(".admin-only").forEach((item) => {
+            item.style.display = "none";
+          });
         }
       }
 

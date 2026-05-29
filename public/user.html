@@ -37,7 +37,7 @@
         position: fixed;
         inset: 0;
         background: rgba(0, 0, 0, 0.4);
-        z-index: 1400;
+        z-index: 999;
         display: none;
       }
 
@@ -58,7 +58,7 @@
         border-right: 1px solid #ebeef0;
         overflow-y: auto;
         transition: 0.3s;
-        z-index: 1500;
+        z-index: 1000;
       }
 
       .sidebar.active {
@@ -475,33 +475,21 @@
           Buat Laporan
         </a>
 
-        <!-- MENU KHUSUS ADMIN -->
+        <!-- KHUSUS ADMIN -->
+        <a href="user.html" class="admin-only active">
+          <i class="fa-solid fa-users"></i>
+          Manajemen User
+        </a>
 
-        <div id="adminMenu">
-          <a href="user.html" class="active">
-            <i class="fa-solid fa-users"></i>
-            Manajemen User
-          </a>
+        <a href="laporan.html">
+          <i class="fa-solid fa-chart-column"></i>
+          Manajemen Laporan
+        </a>
 
-          <a href="laporan.html">
-            <i class="fa-solid fa-chart-column"></i>
-            Manajemen Laporan
-          </a>
-
-          <a href="tambah-user.html">
-            <i class="fa-solid fa-user-plus"></i>
-            Tambah User
-          </a>
-        </div>
-
-        <!-- MENU USER -->
-
-        <div id="userMenu">
-          <a href="laporan.html">
-            <i class="fa-solid fa-chart-column"></i>
-            Manajemen Laporan
-          </a>
-        </div>
+        <a href="tambah-user.html" class="admin-only">
+          <i class="fa-solid fa-user-plus"></i>
+          Tambah User
+        </a>
 
         <div class="menu-title">System</div>
 
@@ -764,6 +752,15 @@
               </div>
 
               <div class="form-row">
+              <label>Password Baru</label>
+              <input
+                id="swal_password"
+                type="password"
+                placeholder="Kosongkan jika tidak diubah"
+              >
+              </div>
+
+              <div class="form-row">
                 <label>Role</label>
 
                 <select id="swal_role">
@@ -796,6 +793,7 @@
               nama: document.getElementById("swal_nama").value,
               jabatan: document.getElementById("swal_jabatan").value,
               username: document.getElementById("swal_username").value,
+              password: document.getElementById("swal_password").value,
               role: document.getElementById("swal_role").value,
             };
           },
@@ -827,18 +825,6 @@
       }
 
       // ================= MENU ROLE =================
-
-      function aturMenuByRole() {
-        const role = localStorage.getItem("role");
-
-        if (role !== "admin") {
-          document.getElementById("adminMenu").style.display = "none";
-        } else {
-          document.getElementById("userMenu").style.display = "none";
-        }
-      }
-
-      aturMenuByRole();
 
       loadUser();
     </script>

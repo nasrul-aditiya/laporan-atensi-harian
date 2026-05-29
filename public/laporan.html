@@ -418,7 +418,11 @@
       .hapus {
         background: #ea5455;
       }
-
+      .judul-cell {
+        max-width: 350px;
+        white-space: normal;
+        line-height: 1.5;
+      }
       /* ================= RESPONSIVE ================= */
 
       @media (max-width: 900px) {
@@ -492,6 +496,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="logo">
         <img src="logo.png" alt="Logo" />
+
         <h3>Laporan Atensi Harian</h3>
       </div>
 
@@ -508,31 +513,21 @@
           Buat Laporan
         </a>
 
-        <!-- MENU ADMIN -->
-        <div id="adminMenu">
-          <a href="user.html">
-            <i class="fa-solid fa-users"></i>
-            Manajemen User
-          </a>
+        <!-- KHUSUS ADMIN -->
+        <a href="user.html" class="admin-only">
+          <i class="fa-solid fa-users"></i>
+          Manajemen User
+        </a>
 
-          <a href="laporan.html" class="active">
-            <i class="fa-solid fa-chart-column"></i>
-            Manajemen Laporan
-          </a>
+        <a href="laporan.html" class="active">
+          <i class="fa-solid fa-chart-column"></i>
+          Manajemen Laporan
+        </a>
 
-          <a href="tambah-user.html">
-            <i class="fa-solid fa-user-plus"></i>
-            Tambah User
-          </a>
-        </div>
-
-        <!-- MENU USER -->
-        <div id="userMenu">
-          <a href="laporan.html" class="active">
-            <i class="fa-solid fa-chart-column"></i>
-            Manajemen Laporan
-          </a>
-        </div>
+        <a href="tambah-user.html" class="admin-only">
+          <i class="fa-solid fa-user-plus"></i>
+          Tambah User
+        </a>
 
         <div class="menu-title">System</div>
 
@@ -605,6 +600,19 @@
             </div>
           </div>
 
+          <div class="input-group">
+            <label>Cari Judul</label>
+
+            <div class="input-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input
+                type="text"
+                id="keyword"
+                placeholder="Masukkan judul postingan"
+              />
+            </div>
+          </div>
+
           <button class="btn btn-search" onclick="loadLaporan()">
             <i class="fa-solid fa-magnifying-glass"></i>
             Cari Data
@@ -631,6 +639,7 @@
               <tr>
                 <th>Tanggal</th>
                 <th>User</th>
+                <th>Judul Postingan</th>
                 <th>Jumlah Postingan</th>
                 <th>Aksi</th>
               </tr>
@@ -680,11 +689,18 @@
       function loadLaporan() {
         const dari = document.getElementById("dari").value;
         const sampai = document.getElementById("sampai").value;
+        const keyword = document.getElementById("keyword").value.trim();
+
+        const params = new URLSearchParams();
+
+        if (dari) params.append("dari", dari);
+        if (sampai) params.append("sampai", sampai);
+        if (keyword) params.append("keyword", keyword);
 
         let url = "/api/laporan";
 
-        if (dari && sampai) {
-          url += `?dari=${dari}&sampai=${sampai}`;
+        if (params.toString()) {
+          url += "?" + params.toString();
         }
 
         fetch(url, {
@@ -706,6 +722,11 @@
                 <tr>
                   <td>${formatTanggalIndo(l.tanggal)}</td>
                   <td>${l.nama}</td>
+
+                  <td class="judul-cell">
+                    ${l.judul_postingan || "-"}
+                  </td>
+
                   <td>${l.jumlah_postingan}</td>
 
                   <td>
@@ -743,7 +764,13 @@
               totalPostingan;
           });
       }
-
+      document
+        .getElementById("keyword")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            loadLaporan();
+          }
+        });
       // ================= DELETE =================
 
       function hapusLaporan(id) {
@@ -918,9 +945,9 @@ Kepala Kantor Imigrasi Kelas II TPI Sambas
         const role = localStorage.getItem("role");
 
         if (role !== "admin") {
-          document.getElementById("adminMenu").style.display = "none";
-        } else {
-          document.getElementById("userMenu").style.display = "none";
+          document.querySelectorAll(".admin-only").forEach((item) => {
+            item.style.display = "none";
+          });
         }
       }
 

@@ -414,11 +414,12 @@
     <aside class="sidebar" id="sidebar">
       <div class="logo">
         <img src="logo.png" alt="Logo" />
+
         <h3>Laporan Atensi Harian</h3>
       </div>
 
       <div class="menu">
-        <a href="#" class="active">
+        <a href="dashboard.html" class="active">
           <i class="fa-solid fa-house"></i>
           Dashboard
         </a>
@@ -430,31 +431,21 @@
           Buat Laporan
         </a>
 
-        <!-- MENU KHUSUS ADMIN -->
-        <div id="adminMenu">
-          <a href="user.html">
-            <i class="fa-solid fa-users"></i>
-            Manajemen User
-          </a>
+        <!-- KHUSUS ADMIN -->
+        <a href="user.html" class="admin-only">
+          <i class="fa-solid fa-users"></i>
+          Manajemen User
+        </a>
 
-          <a href="laporan.html">
-            <i class="fa-solid fa-chart-column"></i>
-            Manajemen Laporan
-          </a>
+        <a href="laporan.html">
+          <i class="fa-solid fa-chart-column"></i>
+          Manajemen Laporan
+        </a>
 
-          <a href="tambah-user.html">
-            <i class="fa-solid fa-user-plus"></i>
-            Tambah User
-          </a>
-        </div>
-
-        <!-- MENU USER -->
-        <div id="userMenu">
-          <a href="laporan.html">
-            <i class="fa-solid fa-chart-column"></i>
-            Manajemen Laporan
-          </a>
-        </div>
+        <a href="tambah-user.html" class="admin-only">
+          <i class="fa-solid fa-user-plus"></i>
+          Tambah User
+        </a>
 
         <div class="menu-title">System</div>
 
@@ -512,10 +503,7 @@
           </p>
         </div>
 
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png"
-          alt="admin"
-        />
+        <img src="tim kerja.jpg" alt="Tim Kerja" />
       </div>
 
       <!-- STATISTIC -->
@@ -696,9 +684,9 @@
         const role = localStorage.getItem("role");
 
         if (role !== "admin") {
-          document.getElementById("adminMenu").style.display = "none";
-        } else {
-          document.getElementById("userMenu").style.display = "none";
+          document.querySelectorAll(".admin-only").forEach((item) => {
+            item.style.display = "none";
+          });
         }
       }
 

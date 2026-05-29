@@ -721,9 +721,11 @@
       // otomatis tutup sidebar saat klik menu di mobile
       document.querySelectorAll(".menu a").forEach((menu) => {
         menu.addEventListener("click", () => {
-          if (window.innerWidth <= 900) {
+          if (
+            window.innerWidth <= 900 &&
+            !menu.getAttribute("onclick")?.includes("logout")
+          ) {
             document.getElementById("sidebar").classList.remove("show");
-
             document.getElementById("overlay").classList.remove("show");
           }
         });
@@ -731,26 +733,12 @@
 
       // ================= USER PROFILE =================
 
-      function getSalam() {
-        const jam = new Date().getHours();
-
-        if (jam >= 4 && jam < 11) return "Selamat Pagi";
-        if (jam >= 11 && jam < 15) return "Selamat Siang";
-        if (jam >= 15 && jam < 18) return "Selamat Sore";
-
-        return "Selamat Malam";
-      }
-
       function tampilkanUser() {
         const nama = localStorage.getItem("nama") || "User";
 
         const role = localStorage.getItem("role") || "user";
 
-        const salam = getSalam();
-
         const inisial = nama.charAt(0).toUpperCase();
-
-        document.getElementById("salamUser").innerText = `${salam}, ${nama} 👋`;
 
         document.getElementById("avatarUser").innerText = inisial;
 

@@ -28,15 +28,15 @@ router.post("/laporan", verifyToken, (req, res) => {
             p.platform.forEach((plat) => {
               db.query(
                 "INSERT INTO platform (postingan_id, jenis, link) VALUES (?, ?, ?)",
-                [postinganId, plat.jenis, plat.link]
+                [postinganId, plat.jenis, plat.link],
               );
             });
-          }
+          },
         );
       });
 
       res.json({ message: "Laporan berhasil disimpan" });
-    }
+    },
   );
 });
 
@@ -48,7 +48,7 @@ router.get("/grafik", (req, res) => {
     (err, results) => {
       if (err) return res.status(500).json(err);
       res.json(results);
-    }
+    },
   );
 });
 
@@ -82,11 +82,11 @@ router.get("/statistik", (req, res) => {
             (err, result3) => {
               data.grafik = result3;
               res.json(data);
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 });
 
@@ -99,7 +99,7 @@ router.get("/mingguan", (req, res) => {
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json(result[0]);
-    }
+    },
   );
 });
 
@@ -115,20 +115,24 @@ router.get("/top-user", (req, res) => {
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json(result[0] || { nama: "-", total: 0 });
-    }
+    },
   );
 });
 
 // ================= READ =================
 router.get("/laporan", verifyToken, (req, res) => {
-  const { dari, sampai, user } = req.query;
+  const { dari, sampai, user, keyword } = req.query;
 
   let sql = `
-    SELECT laporan.*, users.nama 
-    FROM laporan 
-    JOIN users ON laporan.user_id = users.id
-    WHERE 1=1
-  `;
+  SELECT
+    laporan.*,
+    users.nama,
+    GROUP_CONCAT(postingan.judul SEPARATOR '<br>') AS judul_postingan
+  FROM laporan
+  JOIN users ON laporan.user_id = users.id
+  LEFT JOIN postingan ON postingan.laporan_id = laporan.id
+  WHERE 1=1
+`;
 
   const params = [];
 
@@ -142,7 +146,15 @@ router.get("/laporan", verifyToken, (req, res) => {
     params.push(user);
   }
 
-  sql += " ORDER BY tanggal DESC";
+  if (keyword) {
+    sql += " AND postingan.judul LIKE ?";
+    params.push(`%${keyword}%`);
+  }
+
+  sql += `
+  GROUP BY laporan.id, users.nama
+  ORDER BY tanggal DESC
+`;
 
   db.query(sql, params, (err, result) => {
     if (err) return res.status(500).json(err);
@@ -160,7 +172,6 @@ router.delete("/laporan/:id", verifyToken, (req, res) => {
 
 // ================= DETAIL =================
 router.get("/laporan/:id", verifyToken, (req, res) => {
-
   const laporanId = req.params.id;
 
   const sql = `
@@ -190,21 +201,21 @@ router.get("/laporan/:id", verifyToken, (req, res) => {
       laporan_id: rows[0].laporan_id,
       tanggal: rows[0].tanggal,
       nama: rows[0].nama,
-      postingan: {}
+      postingan: {},
     };
 
-    rows.forEach(row => {
+    rows.forEach((row) => {
       if (!result.postingan[row.postingan_id]) {
         result.postingan[row.postingan_id] = {
           judul: row.judul,
-          platform: []
+          platform: [],
         };
       }
 
       if (row.jenis && row.link) {
         result.postingan[row.postingan_id].platform.push({
           jenis: row.jenis,
-          link: row.link
+          link: row.link,
         });
       }
     });

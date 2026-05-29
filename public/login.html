@@ -99,9 +99,17 @@
         color: #a1acb8;
       }
 
+      .input-box i.fa-lock {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a1acb8;
+      }
+
       .input-box input {
         width: 100%;
-        padding: 14px 14px 14px 45px;
+        padding: 14px 50px 14px 45px;
         border: 1px solid #d9dee3;
         border-radius: 14px;
         outline: none;
@@ -112,6 +120,23 @@
       .input-box input:focus {
         border-color: #696cff;
         box-shadow: 0 0 0 4px rgba(105, 108, 255, 0.15);
+      }
+
+      .toggle-password {
+        position: absolute;
+        right: 40px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #a1acb8;
+      }
+
+      .toggle-password:hover {
+        color: #696cff;
+      }
+
+      .input-box input {
+        padding-right: 45px;
       }
 
       .btn-login {
@@ -156,6 +181,23 @@
       }
     </style>
   </head>
+
+  <script>
+    function togglePassword() {
+      const passwordInput = document.getElementById("password");
+      const eyeIcon = document.getElementById("eyeIcon");
+
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash");
+      } else {
+        passwordInput.type = "password";
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye");
+      }
+    }
+  </script>
 
   <body>
     <div class="login-wrapper">
@@ -205,6 +247,10 @@
                 placeholder="Masukkan password"
                 required
               />
+
+              <span class="toggle-password" onclick="togglePassword()">
+                <i class="fa-solid fa-eye" id="eyeIcon"></i>
+              </span>
             </div>
           </div>
 
