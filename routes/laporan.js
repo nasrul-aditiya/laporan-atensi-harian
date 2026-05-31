@@ -92,29 +92,92 @@ router.get("/statistik", (req, res) => {
 
 // jumlah laporan minggu ini
 router.get("/mingguan", (req, res) => {
+  const sekarang = new Date();
+
+  const hari = sekarang.getDay(); // Minggu=0 ... Sabtu=6
+
+  const selisihKeSabtu = hari === 6 ? 0 : hari + 1;
+
+  const tanggalMulai = new Date(sekarang);
+  tanggalMulai.setDate(sekarang.getDate() - selisihKeSabtu);
+  tanggalMulai.setHours(0, 0, 0, 0);
+
+  const tanggalSelesai = new Date(tanggalMulai);
+  tanggalSelesai.setDate(tanggalMulai.getDate() + 6);
+  tanggalSelesai.setHours(23, 59, 59, 999);
+
+  const formatMysql = (date) => {
+    return date.toISOString().slice(0, 19).replace("T", " ");
+  };
+
   db.query(
-    `SELECT COUNT(*) as total 
-     FROM laporan 
-     WHERE YEARWEEK(tanggal, 1) = YEARWEEK(CURDATE(), 1)`,
+    `SELECT COALESCE(SUM(jumlah_postingan),0) as total
+   FROM laporan
+   WHERE tanggal BETWEEN ? AND ?`,
+    [formatMysql(tanggalMulai), formatMysql(tanggalSelesai)],
     (err, result) => {
       if (err) return res.status(500).json(err);
-      res.json(result[0]);
+
+      const formatIndonesia = (date) => {
+        return date.toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        });
+      };
+
+      res.json({
+        total: result[0].total,
+        tanggalMulai: formatIndonesia(tanggalMulai),
+        tanggalSelesai: formatIndonesia(tanggalSelesai),
+      });
     },
   );
 });
 
 // user paling aktif
 router.get("/top-user", (req, res) => {
+  const sekarang = new Date();
+
+  const awalBulan = new Date(sekarang.getFullYear(), sekarang.getMonth(), 1);
+
+  const akhirBulan = new Date(
+    sekarang.getFullYear(),
+    sekarang.getMonth() + 1,
+    0,
+  );
+
+  const formatMysql = (date) => {
+    return date.toISOString().split("T")[0];
+  };
+
   db.query(
-    `SELECT users.nama, COUNT(laporan.id) as total
+    `SELECT 
+        users.nama,
+        COALESCE(SUM(laporan.jumlah_postingan), 0) as total
      FROM laporan
      JOIN users ON users.id = laporan.user_id
+     WHERE tanggal BETWEEN ? AND ?
      GROUP BY user_id
      ORDER BY total DESC
      LIMIT 1`,
+    [formatMysql(awalBulan), formatMysql(akhirBulan)],
     (err, result) => {
       if (err) return res.status(500).json(err);
-      res.json(result[0] || { nama: "-", total: 0 });
+
+      const formatIndonesia = (date) =>
+        date.toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        });
+
+      res.json({
+        nama: result[0]?.nama || "-",
+        total: result[0]?.total || 0,
+        tanggalMulai: formatIndonesia(awalBulan),
+        tanggalSelesai: formatIndonesia(akhirBulan),
+      });
     },
   );
 });
