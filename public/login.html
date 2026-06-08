@@ -319,9 +319,29 @@
       }
 
       // AUTO REDIRECT JIKA SUDAH LOGIN
-      if (localStorage.getItem("token")) {
-        window.location.href = "dashboard.html";
+      async function cekSudahLogin() {
+        const token = localStorage.getItem("token");
+
+        if (!token) return;
+
+        try {
+          const res = await fetch("/api/cek-token", {
+            headers: {
+              Authorization: token,
+            },
+          });
+
+          if (res.ok) {
+            window.location.href = "dashboard.html";
+          } else {
+            localStorage.clear();
+          }
+        } catch (err) {
+          console.error(err);
+        }
       }
+
+      cekSudahLogin();
     </script>
   </body>
 </html>

@@ -18,19 +18,26 @@ router.post("/login", (req, res) => {
 
       const user = results[0];
 
-      const token = jwt.sign(
-        { id: user.id, role: user.role },
-        SECRET,
-        { expiresIn: "1d" }
-      );
+      const token = jwt.sign({ id: user.id, role: user.role }, SECRET, {
+        expiresIn: "8h",
+      });
 
       res.json({
         message: "Login berhasil",
         token,
-        user
+        user,
       });
-    }
+    },
   );
+});
+
+const verifyToken = require("../middleware/auth");
+
+router.get("/cek-token", verifyToken, (req, res) => {
+  res.json({
+    valid: true,
+    user: req.user,
+  });
 });
 
 module.exports = router;

@@ -638,7 +638,7 @@
             <thead>
               <tr>
                 <th>Tanggal</th>
-                <th>User</th>
+                <th>Pembuat Laporan</th>
                 <th>Judul Postingan</th>
                 <th>Jumlah Postingan</th>
                 <th>Aksi</th>
@@ -741,14 +741,14 @@
                     ${
                       roleUser === "admin"
                         ? `
-                      <button
-                        class="action-btn hapus"
-                        onclick="hapusLaporan(${l.id})"
-                      >
-                        <i class="fa-solid fa-trash"></i>
-                        Hapus
-                      </button>
-                    `
+                        <button
+                          class="action-btn hapus"
+                          onclick="hapusLaporan(${l.id})"
+                        >
+                          <i class="fa-solid fa-trash"></i>
+                          Hapus
+                        </button>
+                        `
                         : ""
                     }
                   </td>

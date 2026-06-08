@@ -1,11 +1,38 @@
 // cek login
-function cekLogin() {
+async function cekLogin() {
   const token = localStorage.getItem("token");
 
   if (!token) {
     window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/cek-token", {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    if (!res.ok) {
+      localStorage.clear();
+
+      Swal.fire({
+        icon: "warning",
+        title: "Sesi Berakhir",
+        text: "Silakan login kembali",
+      }).then(() => {
+        window.location.href = "login.html";
+      });
+
+      return;
+    }
+  } catch (err) {
+    console.error(err);
   }
 }
+
+cekLogin();
 
 // logout
 function logout() {
