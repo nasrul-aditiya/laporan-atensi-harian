@@ -921,20 +921,31 @@ Kepala Kantor Imigrasi Kelas II TPI Sambas
             }).then((result) => {
               // tombol salin ditekan
               if (result.isDenied) {
-                const text = document.getElementById("laporanText").value;
-
-                navigator.clipboard.writeText(text).then(() => {
-                  Swal.fire({
-                    icon: "success",
-                    title: "Berhasil",
-                    text: "Laporan berhasil disalin",
-                    timer: 2000,
-                    showConfirmButton: false,
-                  });
-                });
+                copyText(document.getElementById("laporanText").value);
               }
             });
           });
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard
+            .writeText(text)
+            .then(() => {
+              Swal.fire({
+                icon: "success",
+                title: "Berhasil",
+                text: "Laporan berhasil disalin",
+                timer: 2000,
+                showConfirmButton: false,
+              });
+            })
+            .catch(() => {
+              fallbackCopy(text);
+            });
+        } else {
+          fallbackCopy(text);
+        }
       }
 
       // ================= INIT =================
